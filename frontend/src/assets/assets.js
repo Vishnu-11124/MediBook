@@ -297,3 +297,224 @@ export const doctors = [
         }
     },
 ]
+
+export const doctorAvailability = [
+  {
+    doctorId: "doc1",
+    availability: [
+      {
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        start: "09:00",
+        end: "13:00",
+        slotDuration: 30
+      },
+      {
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        start: "15:00",
+        end: "18:00",
+        slotDuration: 30
+      },
+      {
+        days: ["Saturday"],
+        start: "09:00",
+        end: "12:00",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc2",
+    availability: [
+      {
+        days: ["Monday", "Wednesday", "Friday"],
+        start: "10:00",
+        end: "16:00",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc3",
+    availability: [
+      {
+        days: ["Tuesday", "Thursday", "Saturday"],
+        start: "09:00",
+        end: "14:00",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc4",
+    availability: [
+      {
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        start: "08:00",
+        end: "13:00",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc5",
+    availability: [
+      {
+        days: ["Monday", "Wednesday", "Friday"],
+        start: "14:00",
+        end: "20:00",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc6",
+    availability: [
+      {
+        days: ["Tuesday", "Thursday", "Saturday"],
+        start: "09:00",
+        end: "15:00",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc7",
+    availability: [
+      {
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        start: "09:00",
+        end: "12:00",
+        slotDuration: 30
+      },
+      {
+        days: ["Sunday"],
+        start: "09:00",
+        end: "11:30",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc8",
+    availability: [
+      {
+        days: ["Monday", "Wednesday", "Friday"],
+        start: "13:00",
+        end: "18:00",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc9",
+    availability: [
+      {
+        days: ["Tuesday", "Thursday"],
+        start: "10:00",
+        end: "17:00",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc10",
+    availability: [
+      {
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        start: "08:30",
+        end: "12:30",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc11",
+    availability: [
+      {
+        days: ["Monday", "Thursday"],
+        start: "14:00",
+        end: "20:00",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc12",
+    availability: [
+      {
+        days: ["Wednesday", "Friday", "Saturday"],
+        start: "09:00",
+        end: "15:00",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc13",
+    availability: [
+      {
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        start: "09:00",
+        end: "13:00",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc14",
+    availability: [
+      {
+        days: ["Tuesday", "Thursday", "Saturday"],
+        start: "14:00",
+        end: "19:00",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  },
+
+  {
+    doctorId: "doc15",
+    availability: [
+      {
+        days: ["Monday", "Wednesday", "Friday"],
+        start: "09:00",
+        end: "13:00",
+        slotDuration: 30
+      },
+      {
+        days: ["Sunday"],
+        start: "09:00",
+        end: "12:00",
+        slotDuration: 30
+      }
+    ],
+    leaves: []
+  }
+];
