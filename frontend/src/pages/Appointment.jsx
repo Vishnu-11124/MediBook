@@ -8,6 +8,7 @@ const Appointment = () => {
   const { doctors } = useContext(AppContext);
   const [docInfo, setDocInfo] = useState(null);
   const [docAvailability, setDocAvailability] = useState(null);
+  const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
   const [docSlot, setDocSlot] = useState([]);
   const [slotIndex, setSlotIndex] = useState(0);
@@ -98,7 +99,6 @@ const Appointment = () => {
   useEffect(() => {
     if (docAvailability) {
       getAvailableSlots();
-      console.log(docAvailability);
     }
   }, [docAvailability]);
 
@@ -133,6 +133,35 @@ const Appointment = () => {
             </p>
           </div>
         </div>
+
+        {/* booking */}
+        <div>
+          <p>Booking Slots</p>
+          <div>
+            {docSlot.map((slots, index) => {
+              const firstSlot = slots[0];
+
+              return (
+                <div onClick={() => setSlotIndex(index)} key={index}>
+                  <p>{daysOfWeek[firstSlot.datetime.getDay()]}</p>
+
+                  <p>{firstSlot.datetime.getDate()}</p>
+                </div>
+              );
+            })}
+          </div>
+          <div>
+            {docSlot.length > 0 &&
+              docSlot[slotIndex].map((item, i) => (
+                <p key={i} onClick={() => setSlotTime(item.time)}>
+                  {item.time}
+                </p>
+              ))}
+          </div>
+
+          <button>Book an appointment</button>
+        </div>
+
       </div>
     )
   );
