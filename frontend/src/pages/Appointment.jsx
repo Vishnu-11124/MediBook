@@ -1,94 +1,141 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { AppContext } from '../context/AppContext'
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
+import { doctorAvailability } from "../assets/assets";
 
 const Appointment = () => {
-  const {docId} = useParams()
-  const {doctors} = useContext(AppContext)
-  const [docInfo, setDocInfo] = useState(null)
+  const { docId } = useParams();
+  const { doctors } = useContext(AppContext);
+  const [docInfo, setDocInfo] = useState(null);
+  const [docAvailability, setDocAvailability] = useState(null);
 
-  const [docSlot, setDocSlot] = useState([])
-  const [slotIndex, setSlotIndex] = useState(0)
-  const [slotTime, setSlotTime] = useState('')
+  const [docSlot, setDocSlot] = useState([]);
+  const [slotIndex, setSlotIndex] = useState(0);
+  const [slotTime, setSlotTime] = useState("");
 
   const currentDoctor = async () => {
-    setDocInfo(doctors.find(doc => doc._id === docId))
-  }
+    setDocInfo(doctors.find((doc) => doc._id === docId));
+    setDocAvailability(
+      doctorAvailability.find((doc) => doc.doctorId === docId),
+    );
+  };
 
-  const getAvailableSlots = async () => {
-    setDocSlot([])
+  const getAvailableSlots = () => {
+    if (!docAvailability) return;
 
-    let today = new Date()
+    let allSlots = [];
 
-    for(let i = 0; i<7; i++){
-      let currentDate = new Date(today)
-      currentDate.setDate(today.getDate() + i)
+    let today = new Date();
 
-      let endTime = new Date()
-      endTime.setDate(today.getDate() + i)
-      endTime.setHours(21,0,0,0)
+    for (let i = 0; i < 7; i++) {
+      let currentDate = new Date(today);
+      currentDate.setDate(today.getDate() + i);
 
-      if(today.getDate() === currentDate.getDate()){
-        currentDate.setHours(currentDate.getHours() > 10 ? currentDate.getHours() + 1 : 10 )
-        currentDate.setMinutes(currentDate.getMinutes() > 30 ? 30 : 0)
-      } else {
-        currentDate.setHours(10)
-        currentDate.setMinutes(0)
+      const dayName = currentDate.toLocaleDateString("en-US", {
+        weekday: "long",
+      });
+
+      // Check leave
+      const dateString = currentDate.toISOString().split("T")[0];
+
+      if (docAvailability.leaves.includes(dateString)) {
+        continue;
       }
 
-      let timeSlots = []
+      let daySlots = [];
 
-      while(currentDate < endTime){
-        let formattedTime = currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'})
-        timeSlots.push({
-          datetime: new Date(currentDate),
-          time: formattedTime
-        })
+      // Find all sessions for this day
+      const sessions = docAvailability.availability.filter((session) =>
+        session.days.includes(dayName),
+      );
 
-        currentDate.setMinutes(currentDate.getMinutes() + 30)
+      // Doctor doesn't work today
+      if (sessions.length === 0) {
+        continue;
       }
 
-      setDocSlot(prev => ([...prev, timeSlots]))
+      for (const session of sessions) {
+        const [startHour, startMinute] = session.start.split(":").map(Number);
+
+        const [endHour, endMinute] = session.end.split(":").map(Number);
+
+        let slotStart = new Date(currentDate);
+        slotStart.setHours(startHour, startMinute, 0, 0);
+
+        let slotEnd = new Date(currentDate);
+        slotEnd.setHours(endHour, endMinute, 0, 0);
+
+        // Skip passed slots for today
+        if (i === 0) {
+          while (slotStart < today && slotStart < slotEnd) {
+            slotStart.setMinutes(slotStart.getMinutes() + session.slotDuration);
+          }
+        }
+
+        while (slotStart < slotEnd) {
+          daySlots.push({
+            datetime: new Date(slotStart),
+            time: slotStart.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          });
+
+          slotStart.setMinutes(slotStart.getMinutes() + session.slotDuration);
+        }
+      }
+
+      allSlots.push(daySlots);
     }
-  }
+
+    setDocSlot(allSlots);
+  };
 
   useEffect(() => {
-    currentDoctor()
-  },[docId, doctors])
+    currentDoctor();
+  }, [docId, doctors]);
 
   useEffect(() => {
-    getAvailableSlots()
-  }, [docInfo])
+    if (docAvailability) {
+      getAvailableSlots();
+      console.log(docAvailability);
+    }
+  }, [docAvailability]);
 
-  useEffect(() => {
-    console.log(docSlot)
-  }, [docSlot])
+  // useEffect(() => {
+  //   console.log(docSlot);
+  // }, [docSlot]);
 
-  return docInfo && (
-    <div>
-      {/* doctor info */}
+  return (
+    docInfo && (
       <div>
+        {/* doctor info */}
         <div>
-          <img src={docInfo.image} alt="" />
-        </div>
-
-        <div>
-          <p>{docInfo.name}</p>
           <div>
-            <p>{docInfo.degree} - {docInfo.speciality}</p>
-            <span>{docInfo.experience}</span>
+            <img src={docInfo.image} alt="" />
           </div>
 
           <div>
-            <p>About</p>
-            <p>{docInfo.about}</p>
+            <p>{docInfo.name}</p>
+            <div>
+              <p>
+                {docInfo.degree} - {docInfo.speciality}
+              </p>
+              <span>{docInfo.experience}</span>
+            </div>
+
+            <div>
+              <p>About</p>
+              <p>{docInfo.about}</p>
+            </div>
+            <p>
+              Appointment fee: <span>{docInfo.fees}</span>
+            </p>
           </div>
-          <p>Appointment fee: <span>{docInfo.fees}</span></p>
         </div>
       </div>
+    )
+  );
+};
 
-    </div>
-  )
-}
-
-export default Appointment
+export default Appointment;
