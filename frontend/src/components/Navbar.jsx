@@ -4,7 +4,7 @@ import { Menu, User, X } from "lucide-react";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [token, setToken] = useState(true);
+  const [token, setToken] = useState(false);
   const [userDropDown, setUserDropDown] = useState(false);
 
   const navigate = useNavigate();
