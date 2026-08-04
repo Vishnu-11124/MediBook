@@ -6,6 +6,7 @@ import DoctorCard from "../components/DoctorCard";
 const Doctors = () => {
   const { speciality } = useParams();
   const [filterDoc, setFilterDoc] = useState([]);
+  const [showFilter, setShowFilter] = useState(false);
 
   const navigate = useNavigate();
   const { doctors } = useContext(AppContext);
@@ -23,7 +24,7 @@ const Doctors = () => {
     setFilterDoc(
       speciality
         ? doctors.filter((doc) => doc.speciality === speciality)
-        : doctors
+        : doctors,
     );
   };
 
@@ -44,14 +45,60 @@ const Doctors = () => {
         </h1>
 
         <p className="mt-3 max-w-2xl text-slate-600">
-          Browse our experienced doctors by speciality and choose the one
-          that best fits your healthcare needs.
+          Browse our experienced doctors by speciality and choose the one that
+          best fits your healthcare needs.
         </p>
       </div>
 
-      <div className="flex flex-col gap-10 lg:flex-row">
+      {/* Mobile Filter */}
+      <div className="mb-6 lg:hidden">
+        <button
+          onClick={() => setShowFilter(!showFilter)}
+          className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 font-medium text-slate-700 shadow-sm transition hover:border-blue-600 hover:text-blue-600"
+        >
+          Filter
+          <svg
+            className={`h-4 w-4 transition-transform ${
+              showFilter ? "rotate-180" : ""
+            }`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {showFilter && (
+          <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
+            {specialities.map((item) => (
+              <button
+                key={item}
+                onClick={() => {
+                  speciality === item
+                    ? navigate("/doctors")
+                    : navigate(`/doctors/${item}`);
+
+                  setShowFilter(false);
+                }}
+                className={`block w-full border-b border-slate-100 px-5 py-3 text-left transition last:border-none ${
+                  speciality === item
+                    ? "bg-blue-600 text-white"
+                    : "hover:bg-slate-50"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="flex gap-10 lg:flex-row">
         {/* Left Sidebar */}
-        <aside className="lg:w-72">
+        <aside className="hidden lg:block lg:w-72">
+          {" "}
           <div className="sticky top-24 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="mb-5 text-lg font-semibold text-slate-900">
               Specialities
