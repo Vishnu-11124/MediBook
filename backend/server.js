@@ -2,10 +2,14 @@ import express from "express"
 import cors from "cors"
 import 'dotenv/config.js'
 import errorHandler from './middlewares/error.middleware.js'
+import connectDB from "./config/db.js"
 
 
 const app = express()
 const port = process.env.PORT || 4000
+
+// db connection
+connectDB()
 
 // middlewares
 app.use(express.json())
