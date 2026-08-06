@@ -4,6 +4,7 @@ import 'dotenv/config.js'
 import errorHandler from './middlewares/error.middleware.js'
 import connectDB from "./config/db.js"
 import connectCloudinary from "./config/cloudinary.js"
+import adminRouter from "./routes/adminRoute.js"
 
 
 const app = express()
@@ -20,6 +21,8 @@ app.use(express.json())
 app.use(cors())
 
 // api endpoints
+app.use('/api/admin', adminRouter)
+
 app.get("/", (req, res) => {
     res.send("Api working...")
 })
