@@ -4,6 +4,8 @@ import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import bcrypt from "bcrypt";
 import { v2 as cloudinary } from "cloudinary";
+import fs from "fs/promises";
+import jwt from "jsonwebtoken";
 
 // adding doctor
 export const addDoctor = asyncHandler(async (req, res) => {
@@ -101,4 +103,27 @@ export const addDoctor = asyncHandler(async (req, res) => {
   res
     .status(201)
     .json(new ApiResponse(201, doctor, "Doctor added successfully"));
+});
+
+// admin login
+export const adminLogin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw new ApiError(400, "Email and password are required");
+  }
+
+  const isMatch = await bcrypt.compare(password, process.env.ADMIN_PASSWORD);
+
+  if (email !== process.env.ADMIN_EMAIL || !isMatch) {
+    throw new ApiError(401, "Invalid email or password");
+  }
+
+  const token = jwt.sign({ role: "admin" }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, { token }, "Admin logged in successfully"));
 });
