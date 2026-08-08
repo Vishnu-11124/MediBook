@@ -1,50 +1,40 @@
-
 import React, { useContext, useState } from "react";
 import { ShieldCheck, Stethoscope } from "lucide-react";
 import { AdminContext } from "../context/AdminContext";
-import axios from 'axios'
+import axios from "axios";
 import { toast } from "react-toastify";
 
 const Login = () => {
-
   const [state, setState] = useState("Admin");
-  const [email,setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const { setToken, backendUrl } = useContext(AdminContext)
+  const { setToken, backendUrl } = useContext(AdminContext);
 
   const onSubmitHandler = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      if(state === 'Admin'){
-        const {data} = await axios.post(backendUrl + '/api/admin/login',{email, password})
-        if(data.success){
-          localStorage.setItem('token', data.data.token)
-          setToken(data.data.token)
+      if (state === "Admin") {
+        const { data } = await axios.post(backendUrl + "/api/admin/login", {
+          email,
+          password,
+        });
+        if (data.success) {
+          localStorage.setItem("token", data.data.token);
+          setToken(data.data.token);
         }
-      }else{
-
+      } else {
       }
     } catch (error) {
-       toast.error(
-      error.response?.data?.message || "Invalid email or password"
-    );
+      toast.error(error.response?.data?.message || "Invalid email or password");
     }
-
-  }
-
-
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-
       <div className="w-full max-w-md">
-
-        
-
         {/* Login Card */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
-
           {/* Icon */}
           <div className="flex justify-center mb-5">
             <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
@@ -77,7 +67,6 @@ const Login = () => {
 
           {/* Form */}
           <form onSubmit={onSubmitHandler} className="space-y-5">
-
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -187,11 +176,9 @@ const Login = () => {
             )}
           </div>
         </div>
-
       </div>
     </div>
   );
 };
 
 export default Login;
-
