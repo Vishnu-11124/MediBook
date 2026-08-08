@@ -1,9 +1,39 @@
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { ShieldCheck, Stethoscope } from "lucide-react";
+import { AdminContext } from "../context/AdminContext";
+import axios from 'axios'
+import { toast } from "react-toastify";
 
 const Login = () => {
+
   const [state, setState] = useState("Admin");
+  const [email,setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const { setToken, backendUrl } = useContext(AdminContext)
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault()
+    try {
+      if(state === 'Admin'){
+        const {data} = await axios.post(backendUrl + '/api/admin/login',{email, password})
+        if(data.success){
+          localStorage.setItem('token', data.data.token)
+          setToken(data.data.token)
+        }
+      }else{
+
+      }
+    } catch (error) {
+       toast.error(
+      error.response?.data?.message || "Invalid email or password"
+    );
+    }
+
+  }
+
+
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
@@ -46,7 +76,7 @@ const Login = () => {
           </div>
 
           {/* Form */}
-          <form className="space-y-5">
+          <form onSubmit={onSubmitHandler} className="space-y-5">
 
             {/* Email */}
             <div>
@@ -57,6 +87,8 @@ const Login = () => {
               <input
                 type="email"
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="
                   w-full px-4 py-3
                   rounded-lg
@@ -82,6 +114,8 @@ const Login = () => {
               <input
                 type="password"
                 placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="
                   w-full px-4 py-3
                   rounded-lg
