@@ -1,3 +1,4 @@
+
 import React, { useContext } from "react";
 import Login from "./pages/Login";
 import { ToastContainer } from "react-toastify";
@@ -6,6 +7,7 @@ import { AdminContext } from "./context/AdminContext";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import { Route, Routes } from "react-router-dom";
+
 import Dashboard from "./pages/Admin/Dashboard";
 import AllAppointments from "./pages/Admin/AllAppointments";
 import AddDoctor from "./pages/Admin/AddDoctor";
@@ -15,18 +17,41 @@ const App = () => {
   const { token } = useContext(AdminContext);
 
   return token ? (
-    <div>
+    <div className="min-h-screen bg-slate-50">
       <ToastContainer />
+
+      {/* Navbar */}
       <Navbar />
-      <div>
+
+      {/* Sidebar + Main Content */}
+      <div className="flex">
+
+        {/* Sidebar */}
         <Sidebar />
-        <Routes>
-          <Route path='/' element={<></>} />
-          <Route path='/admin-dashboard' element={<Dashboard />} />
-          <Route path='/all-appointments' element={<AllAppointments />} />
-          <Route path='/add-doctor' element={<AddDoctor />} />
-          <Route path='/doctor-list' element={<DoctorsList />} />
-        </Routes>
+
+        {/* Page Content */}
+        <main className="flex-1 min-w-0 p-5 sm:p-8">
+          <Routes>
+            <Route path="/" element={<></>} />
+            <Route
+              path="/admin-dashboard"
+              element={<Dashboard />}
+            />
+            <Route
+              path="/all-appointments"
+              element={<AllAppointments />}
+            />
+            <Route
+              path="/add-doctor"
+              element={<AddDoctor />}
+            />
+            <Route
+              path="/doctor-list"
+              element={<DoctorsList />}
+            />
+          </Routes>
+        </main>
+
       </div>
     </div>
   ) : (
@@ -38,3 +63,4 @@ const App = () => {
 };
 
 export default App;
+
