@@ -24,37 +24,57 @@ const AddDoctor = () => {
     e.preventDefault();
 
     try {
-      
-      if(!image){
-        return toast.error('Image not selected')
+      if (!image) {
+        return toast.error("Image not selected");
       }
 
-      const formData = new FormData()
+      const formData = new FormData();
 
-      formData.append('image', image)
-      formData.append('name', name)
-      formData.append('email', email)
-      formData.append('password', password)
-      formData.append('experience', experience)
-      formData.append('fees', fees)
-      formData.append('about', about)
-      formData.append('speciality', speciality)
-      formData.append('degree', degree)
-      formData.append('address', JSON.stringify({line1: address1, line2: address2}))
+      formData.append("image", image);
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("experience", experience);
+      formData.append("fees", fees);
+      formData.append("about", about);
+      formData.append("speciality", speciality);
+      formData.append("degree", degree);
+      formData.append(
+        "address",
+        JSON.stringify({ line1: address1, line2: address2 }),
+      );
 
       // formData.forEach((val) => {
       //   console.log(val)
       // })
 
-      const {data} = await axios.post(backendUrl + '/api/admin/add-doctor',formData,{headers:{Authorization: `Bearer ${token}`}})
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/add-doctor",
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
 
-      console.log(data)
-
+      // console.log(data)
+      if (data.success) {
+        toast.success(data.message);
+        setImage(false);
+        setName("");
+        setPassword("");
+        setEmail("");
+        setAddress1("");
+        setAddress2("");
+        setFees("");
+        setAbout("");
+        setSpeciality("");
+        setExperience("1 Year");
+        setDegree("");
+      } else {
+        toast.error(data.message);
+      }
     } catch (error) {
-      
+      toast.error(error.message);
+      console.log(error.message);
     }
-
-    
   };
 
   return (
