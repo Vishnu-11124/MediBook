@@ -127,3 +127,18 @@ export const adminLogin = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, { token }, "Admin logged in successfully"));
 });
+
+// fetch all doctors list
+export const allDoctors = asyncHandler(async (req, res) => {
+  const doctors = await DoctorModel.find({}).select("-password");
+
+  if (doctors.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, [], "No doctor data is found"));
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, doctors, "Successfully fetched doctor list!"));
+});
