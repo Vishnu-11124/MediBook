@@ -1,5 +1,5 @@
 import express from "express";
-import { addDoctor, adminLogin, allDoctors } from "../controllers/adminController.js";
+import { addDoctor, adminLogin, allDoctors, allLeaveRequests } from "../controllers/adminController.js";
 import uplpoad from "../middlewares/multer.js";
 import { isAdmin } from "../middlewares/authAdmin.js";
 
@@ -10,5 +10,7 @@ adminRouter.post('/add-doctor', isAdmin, uplpoad.single('image'), addDoctor)
 adminRouter.post('/login', adminLogin)
 
 adminRouter.get('/all-doctors', isAdmin, allDoctors)
+
+adminRouter.get('/leave-requests', isAdmin, allLeaveRequests)
 
 export default adminRouter;

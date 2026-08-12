@@ -1,4 +1,5 @@
 import DoctorModel from "../models/doctorModel.js";
+import LeaveModel from "../models/leaveModel.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
@@ -142,3 +143,14 @@ export const allDoctors = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, doctors, "Successfully fetched doctor list!"));
 });
+
+// fetch all leaves requests
+export const allLeaveRequests = asyncHandler(async (req, res) => {
+  const leaveRequests = await LeaveModel.find({ status: 'pending'}).populate("doctorId", "name email speciality image")
+
+  if(leaveRequests.length === 0){
+    return res.status(200).json(new ApiResponse(200, [], "No pending leave requests found"))
+  }
+
+  res.status(200).json(new ApiResponse(200, leaveRequests, "Successfully fetched leave requests"))
+})
