@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { AdminContext } from "../context/AdminContext";
 import { NavLink } from "react-router-dom";
-import { Calendar, Home, Plus, Users } from "lucide-react";
+import { Calendar, Home, Plus, Users, CalendarClock } from "lucide-react";
 
 const Sidebar = () => {
   const { token } = useContext(AdminContext);
@@ -27,6 +27,11 @@ const Sidebar = () => {
       path: "/doctor-list",
       icon: Users,
     },
+    {
+      name: "Leave Requests",
+      path:"/leave-requests",
+      icon: CalendarClock,
+    }
   ];
 
   return (

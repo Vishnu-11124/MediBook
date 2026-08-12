@@ -12,6 +12,7 @@ import Dashboard from "./pages/Admin/Dashboard";
 import AllAppointments from "./pages/Admin/AllAppointments";
 import AddDoctor from "./pages/Admin/AddDoctor";
 import DoctorsList from "./pages/Admin/DoctorsList";
+import LeaveRequests from "./pages/Admin/LeaveRequests";
 
 const App = () => {
   const { token } = useContext(AdminContext);
@@ -49,6 +50,10 @@ const App = () => {
               path="/doctor-list"
               element={<DoctorsList />}
             />
+            <Route
+            path="/leave-requests"
+            element={<LeaveRequests />}
+             />
           </Routes>
         </main>
 
