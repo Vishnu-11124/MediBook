@@ -53,4 +53,6 @@ const doctorAvailabilitySchema = new mongoose.Schema(
   },
 );
 
-export default mongoose.model("DoctorAvailability", doctorAvailabilitySchema);
+const DoctorAvailabilityModel = mongoose.model("DoctorAvailability", doctorAvailabilitySchema);
+
+export default DoctorAvailabilityModel
