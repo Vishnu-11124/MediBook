@@ -13,10 +13,24 @@ const Login = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+
+    if (!email.trim() || !password.trim()) {
+      toast.error("Email and password are required");
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email.trim())) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
     try {
       if (state === "Admin") {
         const { data } = await axios.post(backendUrl + "/api/admin/login", {
-          email,
+          email: email.trim(),
           password,
         });
         if (data.success) {
