@@ -48,3 +48,39 @@ export const registerUser = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(201, { token }, "User registered successfully"));
 });
+
+export const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw new ApiError(400, "Incomplete details");
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!validator.isEmail(normalizedEmail)) {
+    throw new ApiError(400, "Incorrect email format");
+  }
+
+  const existingUser = await UserModel.findOne({
+    email: normalizedEmail,
+  });
+
+  if (!existingUser) {
+    throw new ApiError(401, "Invalid email or password");
+  }
+
+  const isMatch = await bcrypt.compare(password, existingUser.password);
+
+  if (!isMatch) {
+    throw new ApiError(401, "Invalid email or password");
+  }
+
+  const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, { token }, "User logged in successfully"));
+});
