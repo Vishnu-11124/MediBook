@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Menu, User, X } from "lucide-react";
+import { AppContext } from "../context/AppContext";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [token, setToken] = useState(true);
+  const {token, setToken} = useContext(AppContext)
   const [userDropDown, setUserDropDown] = useState(false);
 
   const navigate = useNavigate();
@@ -15,6 +16,11 @@ const Navbar = () => {
     { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];
+
+  const handleLogout = () => {
+    setToken(false)
+    localStorage.removeItem('token')
+  }
 
   return (
     <nav className="sticky top-0 z-50 border-b border-gray-200/70 bg-white/90 backdrop-blur-md">
@@ -95,10 +101,7 @@ const Navbar = () => {
                     <hr />
 
                     <li
-                      onClick={() => {
-                        setToken(false);
-                        navigate("/");
-                      }}
+                      onClick={handleLogout}
                       className="cursor-pointer px-5 py-3 text-sm text-red-500 transition hover:bg-red-50"
                     >
                       Logout
