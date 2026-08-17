@@ -84,3 +84,15 @@ export const loginUser = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, { token }, "User logged in successfully"));
 });
+
+export const getProfile = asyncHandler(async (req, res) => {
+  const userData = await UserModel.findById(req.userId).select("-password");
+
+  if (!userData) {
+    throw new ApiError(404, "User not found");
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, userData, "Successfully fetched user data."));
+});
