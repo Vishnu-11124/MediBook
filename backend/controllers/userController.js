@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import UserModel from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import ApiResponse from "../utils/ApiResponse.js";
+import {v2 as cloudinary} from 'cloudinary'
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -96,3 +97,24 @@ export const getProfile = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, userData, "Successfully fetched user data."));
 });
+
+export const updateUserProfile = asyncHandler(async (req, res) => {
+  const { name, phone, address, dob, gender } = req.body
+  const userId = req.userId
+  const imageFile = req.file
+
+  if(!name || !phone || !dob || !gender){
+    throw new ApiError(400, "Datas are misssing")
+  }
+
+  await UserModel.findByIdAndUpdate(userId, { name, phone, address: JSON.parse(address), dob, gender})
+
+  if(imageFile){
+    const imageUpload = await cloudinary.uploader.upload(imageFile, {resource_type: 'image'})
+    const imageURL = imageUpload.secure_url
+
+    await UserModel.findByIdAndUpdate(userId, {image: imageURL})
+  }
+
+  res.status(200).json(new ApiResponse(200,{}, "User profile updated successfully"))
+})
