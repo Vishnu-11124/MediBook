@@ -5,7 +5,8 @@ import bcrypt from "bcrypt";
 import UserModel from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import ApiResponse from "../utils/ApiResponse.js";
-import {v2 as cloudinary} from 'cloudinary'
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs/promises";
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -99,22 +100,56 @@ export const getProfile = asyncHandler(async (req, res) => {
 });
 
 export const updateUserProfile = asyncHandler(async (req, res) => {
-  const { name, phone, address, dob, gender } = req.body
-  const userId = req.userId
-  const imageFile = req.file
+  const { name, phone, address, dob, gender } = req.body;
 
-  if(!name || !phone || !dob || !gender){
-    throw new ApiError(400, "Datas are misssing")
+  const userId = req.userId;
+  const imageFile = req.file;
+
+  if (!name || !phone || !address || !dob || !gender) {
+    throw new ApiError(400, "Missing profile details");
   }
 
-  await UserModel.findByIdAndUpdate(userId, { name, phone, address: JSON.parse(address), dob, gender})
+  let parsedAddress;
 
-  if(imageFile){
-    const imageUpload = await cloudinary.uploader.upload(imageFile, {resource_type: 'image'})
-    const imageURL = imageUpload.secure_url
-
-    await UserModel.findByIdAndUpdate(userId, {image: imageURL})
+  try {
+    parsedAddress = JSON.parse(address);
+  } catch {
+    throw new ApiError(400, "Invalid address format");
   }
 
-  res.status(200).json(new ApiResponse(200,{}, "User profile updated successfully"))
-})
+  if (!parsedAddress.line1 || !parsedAddress.line2) {
+    throw new ApiError(400, "Address must contain line1 and line2");
+  }
+
+  const updateData = {
+    name: name.trim(),
+    phone: phone.trim(),
+    address: parsedAddress,
+    dob,
+    gender,
+  };
+
+  if (imageFile) {
+    const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+      resource_type: "image",
+    });
+
+    updateData.image = imageUpload.secure_url;
+
+    await fs.unlink(imageFile.path);
+  }
+
+  const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {
+    new: true,
+  }).select("-password");
+
+  if (!updatedUser) {
+    throw new ApiError(404, "User not found");
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, updatedUser, "User profile updated successfully"),
+    );
+});
