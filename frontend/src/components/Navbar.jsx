@@ -5,9 +5,9 @@ import { AppContext } from "../context/AppContext";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const {token, setToken} = useContext(AppContext)
+  const { token, setToken } = useContext(AppContext);
   const [userDropDown, setUserDropDown] = useState(false);
-
+  const { userData } = useContext(AppContext);
   const navigate = useNavigate();
 
   const navLinks = [
@@ -18,9 +18,9 @@ const Navbar = () => {
   ];
 
   const handleLogout = () => {
-    setToken(false)
-    localStorage.removeItem('token')
-  }
+    setToken(false);
+    localStorage.removeItem("token");
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-gray-200/70 bg-white/90 backdrop-blur-md">
@@ -69,9 +69,17 @@ const Navbar = () => {
               {/* User Avatar */}
               <div
                 onClick={() => setUserDropDown(!userDropDown)}
-                className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-blue-100 transition hover:bg-blue-200"
+                className="flex h-11 w-11 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-blue-100 transition hover:bg-blue-200"
               >
-                <User className="h-5 w-5 text-blue-600" />
+                {userData?.image ? (
+                  <img
+                    src={userData.image}
+                    alt={userData.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <User className="h-5 w-5 text-blue-600" />
+                )}
               </div>
 
               {/* Dropdown */}
