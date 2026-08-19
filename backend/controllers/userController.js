@@ -122,8 +122,8 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
   }
 
   const updateData = {
-    name: name.trim(),
-    phone: phone.trim(),
+    name: name,
+    phone: phone,
     address: parsedAddress,
     dob,
     gender,
