@@ -1,13 +1,44 @@
 import React, { useContext, useState } from "react";
 import { Camera } from "lucide-react";
 import { AppContext } from "../context/AppContext";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const MyProfile = () => {
-  const { userData, setUserData } = useContext(AppContext);
+  const { userData, setUserData, token, backendUrl, loadUserProfileData } = useContext(AppContext);
 
   // console.log(userData)
   const [isEdit, setIsEdit] = useState(false);
   const [image, setImage] = useState(false);
+
+  const updateUserProfileData = async () => {
+    try {
+      const formData = new FormData()
+
+      formData.append('name', userData.name)
+      formData.append('phone', userData.phone)
+      formData.append('address', JSON.stringify(userData.address))
+      formData.append('gender', userData.gender)
+      formData.append('dob', userData.dob)
+
+      image && formData.append('image',image)
+
+      const {data} = await axios.post(backendUrl + '/api/user/update-profile', formData, { headers: { Authorization: `Bearer ${token}`}})
+
+      if(data.message){
+        toast.success(data.message)
+        await loadUserProfileData()
+        setIsEdit(false)
+        setImage(fasle)
+      }else{
+        toast.error(data.message)
+      }
+
+      
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
 
   return userData && (
     <section className="mx-auto max-w-2xl px-4 py-4">
@@ -222,17 +253,7 @@ const MyProfile = () => {
               </button>
 
               <button
-                onClick={() => {
-                  if (image) {
-                    setUserData((prev) => ({
-                      ...prev,
-                      image: URL.createObjectURL(image),
-                    }));
-                  }
-
-                  setImage(false);
-                  setIsEdit(false);
-                }}
+                onClick={updateUserProfileData}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
               >
                 Save Changes
