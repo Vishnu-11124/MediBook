@@ -9,7 +9,7 @@ const MyProfile = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [image, setImage] = useState(false);
 
-  return (
+  return userData && (
     <section className="mx-auto max-w-2xl px-4 py-4">
       <div className="rounded-2xl border border-slate-200 bg-slate-100 p-5 shadow-sm">
         {/* Header */}
@@ -167,7 +167,7 @@ const MyProfile = () => {
               <div className="mt-1 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <input
                   type="text"
-                  value={userData.address.line1}
+                  value={userData.address?.line1 || " "}
                   placeholder="Address Line 1"
                   onChange={(e) =>
                     setUserData({
@@ -183,7 +183,7 @@ const MyProfile = () => {
 
                 <input
                   type="text"
-                  value={userData.address.line2}
+                  value={userData.address?.line2 || " "}
                   placeholder="Address Line 2"
                   onChange={(e) =>
                     setUserData({
@@ -199,9 +199,9 @@ const MyProfile = () => {
               </div>
             ) : (
               <p className="mt-1 text-sm font-medium leading-5 text-slate-900">
-                {userData.address.line1}
+                {userData.address?.line1 || " "}
                 <br />
-                {userData.address.line2}
+                {userData.address?.line2 || " "}
               </p>
             )}
           </div>
