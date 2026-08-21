@@ -29,6 +29,11 @@ const availabilitySchema = new mongoose.Schema(
 
 const leaveSchema = new mongoose.Schema(
   {
+    leaveId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+
     date: {
       type: Date,
       required: true,
