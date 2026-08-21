@@ -8,14 +8,17 @@ const availabilitySchema = new mongoose.Schema(
         required: true,
       },
     ],
+
     start: {
       type: String,
       required: true,
     },
+
     end: {
       type: String,
       required: true,
     },
+
     slotDuration: {
       type: Number,
       default: 30,
@@ -30,7 +33,11 @@ const leaveSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    reason: String,
+
+    reason: {
+      type: String,
+      trim: true,
+    },
   },
   { _id: false },
 );
@@ -44,15 +51,24 @@ const doctorAvailabilitySchema = new mongoose.Schema(
       unique: true,
     },
 
-    availability: [availabilitySchema],
+    availability: {
+      type: [availabilitySchema],
+      default: [],
+    },
 
-    leaves: [leaveSchema],
+    leaves: {
+      type: [leaveSchema],
+      default: [],
+    },
   },
   {
     timestamps: true,
   },
 );
 
-const DoctorAvailabilityModel = mongoose.model("DoctorAvailability", doctorAvailabilitySchema);
+const DoctorAvailabilityModel = mongoose.model(
+  "DoctorAvailability",
+  doctorAvailabilitySchema,
+);
 
-export default DoctorAvailabilityModel
+export default DoctorAvailabilityModel;
