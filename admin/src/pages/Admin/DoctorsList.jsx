@@ -1,9 +1,11 @@
 import React, { useContext, useEffect } from "react";
 import { AdminContext } from "../../context/AdminContext";
 import { Pencil, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const DoctorsList = () => {
   const { doctors, getAllDoctors, token } = useContext(AdminContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (token) {
@@ -37,6 +39,9 @@ const DoctorsList = () => {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {doctors.map((doctor) => (
             <div
+              onClick={() => {
+                navigate(`/doctor-list/${doctor?._id}`);
+              }}
               key={doctor?._id}
               className="overflow-hidden rounded-xl border border-gray-200 bg-white transition hover:shadow-md"
             >
