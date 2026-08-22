@@ -246,10 +246,6 @@ export const doctorDetails = asyncHandler(async (req, res) => {
     doctor: doctorId,
   });
 
-  if (!availability) {
-    throw new ApiError(404, "Doctor availability not found");
-  }
-
   res.status(200).json(
     new ApiResponse(
       200,
