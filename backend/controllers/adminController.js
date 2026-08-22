@@ -228,3 +228,36 @@ export const addDoctorAvailability = asyncHandler(async (req, res) => {
       ),
     );
 });
+
+export const doctorDetails = asyncHandler(async (req, res) => {
+  const { doctorId } = req.params;
+
+  if (!doctorId) {
+    throw new ApiError(400, "Doctor ID not found");
+  }
+
+  const doctorData = await DoctorModel.findById(doctorId).select("-password");
+
+  if (!doctorData) {
+    throw new ApiError(404, "Doctor not found");
+  }
+
+  const availability = await DoctorAvailabilityModel.findOne({
+    doctor: doctorId,
+  });
+
+  if (!availability) {
+    throw new ApiError(404, "Doctor availability not found");
+  }
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        doctorData,
+        availability,
+      },
+      "Doctor details fetched successfully",
+    ),
+  );
+});
