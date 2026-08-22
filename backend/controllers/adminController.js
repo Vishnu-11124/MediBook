@@ -1,3 +1,4 @@
+import DoctorAvailabilityModel from "../models/availabilityModel.js";
 import DoctorModel from "../models/doctorModel.js";
 import LeaveModel from "../models/leaveModel.js";
 import ApiError from "../utils/ApiError.js";
@@ -108,48 +109,37 @@ export const addDoctor = asyncHandler(async (req, res) => {
 
 // admin login
 export const adminLogin = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-        throw new ApiError(400, "Email and password are required");
-    }
+  if (!email || !password) {
+    throw new ApiError(400, "Email and password are required");
+  }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(email)) {
-        throw new ApiError(400, "Invalid email format");
-    }
+  if (!emailRegex.test(email)) {
+    throw new ApiError(400, "Invalid email format");
+  }
 
-    const normalizedEmail = email.trim().toLowerCase();
+  const normalizedEmail = email.trim().toLowerCase();
 
-    if (
-        normalizedEmail !== process.env.ADMIN_EMAIL.toLowerCase()
-    ) {
-        throw new ApiError(401, "Invalid email or password");
-    }
+  if (normalizedEmail !== process.env.ADMIN_EMAIL.toLowerCase()) {
+    throw new ApiError(401, "Invalid email or password");
+  }
 
-    const isMatch = await bcrypt.compare(
-        password,
-        process.env.ADMIN_PASSWORD
-    );
+  const isMatch = await bcrypt.compare(password, process.env.ADMIN_PASSWORD);
 
-    if (!isMatch) {
-        throw new ApiError(401, "Invalid email or password");
-    }
+  if (!isMatch) {
+    throw new ApiError(401, "Invalid email or password");
+  }
 
-    const token = jwt.sign(
-        { role: "admin" },
-        process.env.JWT_SECRET,
-        { expiresIn: "7d" }
-    );
+  const token = jwt.sign({ role: "admin" }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
 
-    res.status(200).json(
-        new ApiResponse(
-            200,
-            { token },
-            "Admin logged in successfully"
-        )
-    );
+  res
+    .status(200)
+    .json(new ApiResponse(200, { token }, "Admin logged in successfully"));
 });
 
 // fetch all doctors list
@@ -169,11 +159,72 @@ export const allDoctors = asyncHandler(async (req, res) => {
 
 // fetch all leaves requests
 export const allLeaveRequests = asyncHandler(async (req, res) => {
-  const leaveRequests = await LeaveModel.find({ status: 'pending'}).populate("doctorId", "name email speciality image")
+  const leaveRequests = await LeaveModel.find({ status: "pending" }).populate(
+    "doctorId",
+    "name email speciality image",
+  );
 
-  if(leaveRequests.length === 0){
-    return res.status(200).json(new ApiResponse(200, [], "No pending leave requests found"))
+  if (leaveRequests.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, [], "No pending leave requests found"));
   }
 
-  res.status(200).json(new ApiResponse(200, leaveRequests, "Successfully fetched leave requests"))
-})
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        leaveRequests,
+        "Successfully fetched leave requests",
+      ),
+    );
+});
+
+// doctor availability
+export const addDoctorAvailability = asyncHandler(async (req, res) => {
+  const { doctorId } = req.params;
+
+  if (!doctorId) {
+    throw new ApiError(400, "Doctor ID not found");
+  }
+
+  const { availability } = req.body;
+
+  if (
+    !availability ||
+    !Array.isArray(availability) ||
+    availability.length === 0
+  ) {
+    throw new ApiError(400, "Availability data is required");
+  }
+
+  const doctorData = await DoctorModel.findById(doctorId).select("-password");
+
+  if (!doctorData) {
+    throw new ApiError(404, "Doctor not found");
+  }
+
+  const existingAvailability = await DoctorAvailabilityModel.findOne({
+    doctor: doctorId,
+  });
+
+  if (existingAvailability) {
+    throw new ApiError(400, "Doctor availability already exists");
+  }
+
+  const doctorAvailability = await DoctorAvailabilityModel.create({
+    doctor: doctorId,
+    availability,
+  });
+
+  res
+    .status(201)
+    .json(
+      new ApiResponse(
+        201,
+        doctorAvailability,
+        "Doctor availability added successfully",
+      ),
+    );
+});
