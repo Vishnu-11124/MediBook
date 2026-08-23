@@ -13,8 +13,8 @@ adminRouter.get('/all-doctors', isAdmin, allDoctors)
 
 adminRouter.get('/leave-requests', isAdmin, allLeaveRequests)
 
-adminRouter.post('/add-availability', isAdmin, addDoctorAvailability)
+adminRouter.post('/doctors/:doctorId/add-availability', isAdmin, addDoctorAvailability)
 
-adminRouter.get('/doctor-details', isAdmin, doctorDetails)
+adminRouter.get('/doctors/:doctorId/doctor-details', isAdmin, doctorDetails)
 
 export default adminRouter;
