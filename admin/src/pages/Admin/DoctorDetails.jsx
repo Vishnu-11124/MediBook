@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { AdminContext } from "../../context/AdminContext";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import {X} from 'lucide-react'
 
 const DoctorDetails = () => {
   const { token, backendUrl } = useContext(AdminContext);
@@ -15,6 +16,7 @@ const DoctorDetails = () => {
 
   const [doctorData, setDoctorData] = useState(null);
   const [availability, setAvailability] = useState(null);
+  const [formOpen, setFormOpen] = useState(false)
 
   const getDoctorDetails = async () => {
     try {
@@ -174,13 +176,25 @@ const DoctorDetails = () => {
                   be scheduled.
                 </p>
 
-                <button className="mt-5 px-5 py-2.5 rounded-lg bg-gray-900 text-white text-sm hover:bg-gray-800 transition">
+                <button onClick={() => setFormOpen(open)} className="mt-5 px-5 py-2.5 rounded-lg bg-gray-900 text-white text-sm hover:bg-gray-800 transition">
                   Add Availability
                 </button>
               </div>
             )}
           </div>
         </div>
+        {
+          formOpen && 
+          <div>
+            <div>
+              <h2>Doctor Availability</h2>
+              <div>
+                <X onClick={() => setFormOpen(false)} />
+              </div>
+            </div>
+            {/* form content */}
+          </div>
+        }
       </div>
     )
   );
