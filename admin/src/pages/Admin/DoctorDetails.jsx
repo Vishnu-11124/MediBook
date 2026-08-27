@@ -72,12 +72,39 @@ const DoctorDetails = () => {
     ]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     console.log("Final availability:", availabilityForm);
 
-    // addAvailability(availabilityForm)
+    try {
+      const { data } = await axios.post(
+        backendUrl + `/api/admin/doctors/${doctorId}/add-availability`,
+        {
+          availability: availabilityForm,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+
+        // Close the form
+        setFormOpen(false);
+
+        // Refresh doctor details + availability
+        getDoctorDetails();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+      console.log(error);
+    }
   };
 
   const formatTime = (time) => {
