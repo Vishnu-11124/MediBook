@@ -80,6 +80,18 @@ const DoctorDetails = () => {
     // addAvailability(availabilityForm)
   };
 
+  const formatTime = (time) => {
+    const [hour, minute] = time.split(":");
+
+    const date = new Date();
+    date.setHours(Number(hour), Number(minute));
+
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const getDoctorDetails = async () => {
     try {
       const { data } = await axios.get(
@@ -219,9 +231,71 @@ const DoctorDetails = () => {
           {/* ================= Availability ================= */}
           <div className="bg-white border border-gray-200 rounded-xl">
             {availability ? (
-              <div>
-                {/* Your availability UI will go here */}
-                <p className="p-6">Doctor availability</p>
+              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                {/* Header */}
+                <div className="px-6 py-5 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      Doctor Availability
+                    </h2>
+
+                    <p className="text-sm text-gray-500 mt-1">
+                      Weekly working schedule
+                    </p>
+                  </div>
+                </div>
+
+                <hr className="border-gray-100" />
+
+                {/* Availability */}
+                <div className="p-6">
+                  <div className="space-y-4">
+                    {availability.availability.map((slot, index) => (
+                      <div
+                        key={index}
+                        className="border border-gray-200 rounded-xl p-5"
+                      >
+                        {/* Days */}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {slot.days.map((day) => (
+                            <span
+                              key={day}
+                              className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium"
+                            >
+                              {day}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Time */}
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <p className="text-xs text-gray-500 mb-1">
+                              Working Hours
+                            </p>
+
+                            <p className="text-base font-semibold text-gray-800">
+                              {formatTime(slot.start)} - {formatTime(slot.end)}
+                            </p>
+                          </div>
+
+                          <div className="h-8 w-px bg-gray-200" />
+
+                          {/* Duration */}
+                          <div>
+                            <p className="text-xs text-gray-500 mb-1">
+                              Slot Duration
+                            </p>
+
+                            <p className="text-sm font-medium text-gray-700">
+                              {slot.slotDuration} minutes
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="min-h-[300px] flex flex-col items-center justify-center text-center p-6">
