@@ -249,166 +249,177 @@ const DoctorDetails = () => {
           </div>
         </div>
         {formOpen && (
-          <div className="bg-white border border-gray-200 rounded-xl mb-6 overflow-hidden">
-            {/* Form Header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800">
-                  Doctor Availability
-                </h2>
+          <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 sm:p-6 overflow-y-auto">
+            {/* Background overlay */}
+            <div
+              className="absolute inset-0 bg-black/70"
+              onClick={() => setFormOpen(false)}
+            />
 
-                <p className="text-sm text-gray-500 mt-1">
-                  Set the doctor's weekly working hours and appointment slots.
-                </p>
+            {/* Floating form */}
+            <div className="relative z-[101] w-full max-w-3xl bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden">
+              {/* Form Header */}
+              <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    Doctor Availability
+                  </h2>
+
+                  <p className="text-sm text-gray-500 mt-1">
+                    Set the doctor's weekly working hours and appointment slots.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setFormOpen(false)}
+                  className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition"
+                >
+                  <X size={20} />
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setFormOpen(false)}
-                className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition"
-              >
-                <X size={20} />
-              </button>
-            </div>
+              {/* Form Content */}
+              <div className="p-6">
+                <form onSubmit={handleSubmit}>
+                  {/* Slots */}
+                  <div className="space-y-5">
+                    {availabilityForm.map((slot, index) => (
+                      <div
+                        key={index}
+                        className="border border-gray-200 rounded-xl p-5"
+                      >
+                        {/* Slot Header */}
+                        <div className="flex items-center justify-between mb-5">
+                          <h3 className="text-sm font-semibold text-gray-800">
+                            Slot {index + 1}
+                          </h3>
 
-            {/* Form Content */}
-            <div className="p-6">
-              <form onSubmit={handleSubmit}>
-                {/* Slots */}
-                <div className="space-y-5">
-                  {availabilityForm.map((slot, index) => (
-                    <div
-                      key={index}
-                      className="border border-gray-200 rounded-xl p-5"
+                          <span className="text-xs text-gray-400">
+                            Weekly schedule
+                          </span>
+                        </div>
+
+                        {/* Days */}
+                        <div className="mb-5">
+                          <label className="block text-sm font-medium text-gray-700 mb-3">
+                            Working Days
+                          </label>
+
+                          <div className="flex flex-wrap gap-2">
+                            {days.map((day) => {
+                              const selected = slot.days.includes(day);
+
+                              return (
+                                <label
+                                  key={day}
+                                  className={`cursor-pointer px-3 py-2 rounded-lg border text-sm transition
+                            ${
+                              selected
+                                ? "bg-gray-900 text-white border-gray-900"
+                                : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                            }
+                          `}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={selected}
+                                    onChange={() => handleDayChange(index, day)}
+                                    className="hidden"
+                                  />
+
+                                  {day.slice(0, 3)}
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Time + Duration */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          {/* Start */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Start Time
+                            </label>
+
+                            <input
+                              type="time"
+                              value={slot.start}
+                              onChange={(e) =>
+                                handleSlotChange(index, "start", e.target.value)
+                              }
+                              onClick={(e) => e.target.showPicker?.()}
+                              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200 cursor-pointer"
+                            />
+                          </div>
+
+                          {/* End */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              End Time
+                            </label>
+
+                            <input
+                              type="time"
+                              value={slot.end}
+                              onChange={(e) =>
+                                handleSlotChange(index, "end", e.target.value)
+                              }
+                              onClick={(e) => e.target.showPicker?.()}
+                              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200 cursor-pointer"
+                            />
+                          </div>
+
+                          {/* Duration */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Slot Duration
+                            </label>
+
+                            <select
+                              value={slot.slotDuration}
+                              onChange={(e) =>
+                                handleSlotChange(
+                                  index,
+                                  "slotDuration",
+                                  Number(e.target.value),
+                                )
+                              }
+                              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 bg-white outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200"
+                            >
+                              <option value={15}>15 minutes</option>
+                              <option value={30}>30 minutes</option>
+                              <option value={45}>45 minutes</option>
+                              <option value={60}>60 minutes</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Form Actions */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-6">
+                    {/* Add Another Slot */}
+                    <button
+                      type="button"
+                      onClick={addAnotherSlot}
+                      className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
                     >
-                      {/* Slot Header */}
-                      <div className="flex items-center justify-between mb-5">
-                        <h3 className="text-sm font-semibold text-gray-800">
-                          Slot {index + 1}
-                        </h3>
+                      + Add Another Slot
+                    </button>
 
-                        <span className="text-xs text-gray-400">
-                          Weekly schedule
-                        </span>
-                      </div>
-
-                      {/* Days */}
-                      <div className="mb-5">
-                        <label className="block text-sm font-medium text-gray-700 mb-3">
-                          Working Days
-                        </label>
-
-                        <div className="flex flex-wrap gap-2">
-                          {days.map((day) => {
-                            const selected = slot.days.includes(day);
-
-                            return (
-                              <label
-                                key={day}
-                                className={`cursor-pointer px-3 py-2 rounded-lg border text-sm transition
-                          ${
-                            selected
-                              ? "bg-gray-900 text-white border-gray-900"
-                              : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
-                          }
-                        `}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={selected}
-                                  onChange={() => handleDayChange(index, day)}
-                                  className="hidden"
-                                />
-
-                                {day.slice(0, 3)}
-                              </label>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Time + Duration */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        {/* Start */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Start Time
-                          </label>
-
-                          <input
-                            type="time"
-                            value={slot.start}
-                            onChange={(e) =>
-                              handleSlotChange(index, "start", e.target.value)
-                            }
-                            className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200"
-                          />
-                        </div>
-
-                        {/* End */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            End Time
-                          </label>
-
-                          <input
-                            type="time"
-                            value={slot.end}
-                            onChange={(e) =>
-                              handleSlotChange(index, "end", e.target.value)
-                            }
-                            className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200"
-                          />
-                        </div>
-
-                        {/* Duration */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Slot Duration
-                          </label>
-
-                          <select
-                            value={slot.slotDuration}
-                            onChange={(e) =>
-                              handleSlotChange(
-                                index,
-                                "slotDuration",
-                                Number(e.target.value),
-                              )
-                            }
-                            className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 bg-white outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200"
-                          >
-                            <option value={15}>15 minutes</option>
-                            <option value={30}>30 minutes</option>
-                            <option value={45}>45 minutes</option>
-                            <option value={60}>60 minutes</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Form Actions */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-6">
-                  {/* Add Another Slot */}
-                  <button
-                    type="button"
-                    onClick={addAnotherSlot}
-                    className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
-                  >
-                    + Add Another Slot
-                  </button>
-
-                  {/* Submit */}
-                  <button
-                    type="submit"
-                    className="px-5 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition"
-                  >
-                    Add Availability
-                  </button>
-                </div>
-              </form>
+                    {/* Submit */}
+                    <button
+                      type="submit"
+                      className="px-5 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition"
+                    >
+                      Add Availability
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         )}
