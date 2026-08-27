@@ -11,7 +11,7 @@ adminRouter.post('/login', adminLogin)
 
 adminRouter.get('/all-doctors', isAdmin, allDoctors)
 
-adminRouter.get('/leave-requests', isAdmin, allLeaveRequests)
+adminRouter.get('/doctors/leave-requests', isAdmin, allLeaveRequests)
 
 adminRouter.post('/doctors/:doctorId/add-availability', isAdmin, addDoctorAvailability)
 
