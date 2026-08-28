@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import RelatedDoctors from "../components/RelatedDoctors";
-import {toast} from 'react-toastify'
-import axios from 'axios'
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const Appointment = () => {
   const { docId } = useParams();
@@ -18,7 +18,6 @@ const Appointment = () => {
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState("");
 
-
   const getAvailableSlots = () => {
     if (!docAvailability) return;
 
@@ -28,16 +27,24 @@ const Appointment = () => {
 
     for (let i = 0; i < 7; i++) {
       let currentDate = new Date(today);
+
       currentDate.setDate(today.getDate() + i);
 
       const dayName = currentDate.toLocaleDateString("en-US", {
         weekday: "long",
       });
 
-      // Check leave
+      // Current date in YYYY-MM-DD format
       const dateString = currentDate.toISOString().split("T")[0];
 
-      if (docAvailability.leaves.includes(dateString)) {
+      // Check doctor leave
+      const isOnLeave = docAvailability.leaves.some((leave) => {
+        const leaveDate = new Date(leave.date).toISOString().split("T")[0];
+
+        return leaveDate === dateString;
+      });
+
+      if (isOnLeave) {
         continue;
       }
 
@@ -53,15 +60,18 @@ const Appointment = () => {
         continue;
       }
 
+      // Generate slots for each session
       for (const session of sessions) {
         const [startHour, startMinute] = session.start.split(":").map(Number);
 
         const [endHour, endMinute] = session.end.split(":").map(Number);
 
         let slotStart = new Date(currentDate);
+
         slotStart.setHours(startHour, startMinute, 0, 0);
 
         let slotEnd = new Date(currentDate);
+
         slotEnd.setHours(endHour, endMinute, 0, 0);
 
         // Skip passed slots for today
@@ -71,9 +81,11 @@ const Appointment = () => {
           }
         }
 
+        // Generate slots
         while (slotStart < slotEnd) {
           daySlots.push({
             datetime: new Date(slotStart),
+
             time: slotStart.toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
@@ -92,16 +104,25 @@ const Appointment = () => {
 
   const getDoctorDetails = async () => {
     try {
-      const {data} = await axios.get(backendUrl + `/api/admin/doctors/${docId}/doctor-details`)
-      console.log(data)
+      const { data } = await axios.get(
+        backendUrl + `/api/user/doctors/${docId}/doctor-details`,
+      );
+      if (data.success) {
+        console.log("doctor:", data);
+        setDocInfo(data?.data?.doctorData);
+        setDocAvailability(data?.data?.availability);
+      } else {
+        toast.error(error.message);
+        console.log(error.message);
+      }
     } catch (error) {
-      toast.error(error.message)
-      console.log(error.message)
+      toast.error(error.message);
+      console.log(error.message);
     }
-  }
+  };
 
   useEffect(() => {
-    getDoctorDetails()
+    getDoctorDetails();
   }, [docId]);
 
   useEffect(() => {
