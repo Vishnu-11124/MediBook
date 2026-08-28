@@ -1,26 +1,23 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
-import { doctorAvailability } from "../assets/assets";
 import RelatedDoctors from "../components/RelatedDoctors";
+import {toast} from 'react-toastify'
+import axios from 'axios'
 
 const Appointment = () => {
   const { docId } = useParams();
-  const { doctors } = useContext(AppContext);
+  const { backendUrl } = useContext(AppContext);
   const [docInfo, setDocInfo] = useState(null);
   const [docAvailability, setDocAvailability] = useState(null);
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+  // const [doctorAvailability, setDoctorAvailability] = useState([])
 
   const [docSlot, setDocSlot] = useState([]);
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState("");
 
-  const currentDoctor = async () => {
-    setDocInfo(doctors.find((doc) => doc._id === docId));
-    setDocAvailability(
-      doctorAvailability.find((doc) => doc.doctorId === docId),
-    );
-  };
 
   const getAvailableSlots = () => {
     if (!docAvailability) return;
@@ -93,9 +90,19 @@ const Appointment = () => {
     setDocSlot(allSlots);
   };
 
+  const getDoctorDetails = async () => {
+    try {
+      const {data} = await axios.get(backendUrl + `/api/admin/doctors/${docId}/doctor-details`)
+      console.log(data)
+    } catch (error) {
+      toast.error(error.message)
+      console.log(error.message)
+    }
+  }
+
   useEffect(() => {
-    currentDoctor();
-  }, [docId, doctors]);
+    getDoctorDetails()
+  }, [docId]);
 
   useEffect(() => {
     if (docAvailability) {
