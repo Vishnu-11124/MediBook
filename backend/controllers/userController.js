@@ -153,3 +153,15 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
       new ApiResponse(200, updatedUser, "User profile updated successfully"),
     );
 });
+
+// book appointment
+export const bookAppointment = asyncHandler(async (req, res) => {
+  const userId = req.userId
+  const {slotDate, slotTime} = req.body
+  const { doctorId } = req.params;
+
+  if (!doctorId) {
+    throw new ApiError(400, "Doctor ID not found");
+  }
+
+})
