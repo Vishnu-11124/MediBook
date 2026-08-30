@@ -7,6 +7,9 @@ import jwt from "jsonwebtoken";
 import ApiResponse from "../utils/ApiResponse.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs/promises";
+import DoctorModel from "../models/doctorModel.js";
+import DoctorAvailabilityModel from "../models/availabilityModel.js";
+import AppointmentModel from "../models/appointmentModel.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -163,5 +166,42 @@ export const bookAppointment = asyncHandler(async (req, res) => {
   if (!doctorId) {
     throw new ApiError(400, "Doctor ID not found");
   }
+
+  const doctorData = await DoctorModel.findById(doctorId).select('-password')
+  if(!doctorData.available){
+    throw new ApiError(400, "Doctor not found");
+  }
+
+  let slots_booked = doctorData.slots_booked
+
+  if(slots_booked[slotDate]){
+    if(slots_booked[slotDate].includes(slotTime)){
+      return res.status(400).json(400,null,"Slot not available")
+    }else{
+      slots_booked[slotDate].push(slotTime)
+    }
+  }else{
+    slots_booked[slotDate] = []
+    slots_booked[slotDate].push(slotTime)
+  }
+
+  const userData = await UserModel.findById(userId).select('-password')
+
+  delete doctorData.slots_booked
+
+  const appointmentData = {
+    userId,
+    doctorId,
+    amount: doctorData.fees,
+    slotDate,
+    slotTime
+    }
+
+  const newAppointment = new AppointmentModel(appointmentData)
+  await newAppointment.save()  
+
+  await DoctorModel.findById(doctorId, {slots_booked})
+
+  res.status(200).json(200, null, "Appointment booked successfully")
 
 })
