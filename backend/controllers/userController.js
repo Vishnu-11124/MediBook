@@ -159,49 +159,68 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
 
 // book appointment
 export const bookAppointment = asyncHandler(async (req, res) => {
-  const userId = req.userId
-  const {slotDate, slotTime} = req.body
+  const userId = req.userId;
+  const { slotDate, slotTime } = req.body;
   const { doctorId } = req.params;
 
+  // Validate input
   if (!doctorId) {
     throw new ApiError(400, "Doctor ID not found");
   }
 
-  const doctorData = await DoctorModel.findById(doctorId).select('-password')
-  if(!doctorData.available){
-    throw new ApiError(400, "Doctor not found");
+  if (!slotDate || !slotTime) {
+    throw new ApiError(400, "Slot date and time are required");
   }
 
-  let slots_booked = doctorData.slots_booked
+  // Check doctor
+  const doctorData = await DoctorModel.findById(doctorId).select("-password");
 
-  if(slots_booked[slotDate]){
-    if(slots_booked[slotDate].includes(slotTime)){
-      return res.status(400).json(400,null,"Slot not available")
-    }else{
-      slots_booked[slotDate].push(slotTime)
-    }
-  }else{
-    slots_booked[slotDate] = []
-    slots_booked[slotDate].push(slotTime)
+  if (!doctorData) {
+    throw new ApiError(404, "Doctor not found");
   }
 
-  const userData = await UserModel.findById(userId).select('-password')
+  if (!doctorData.available) {
+    throw new ApiError(400, "Doctor is currently unavailable");
+  }
 
-  delete doctorData.slots_booked
+  // Check whether slot is already booked
+  let slots_booked = doctorData.slots_booked;
 
+  if (!slots_booked[slotDate]) {
+    slots_booked[slotDate] = [];
+  }
+
+  if (slots_booked[slotDate].includes(slotTime)) {
+    throw new ApiError(400, "Slot not available");
+  }
+
+  // Add slot
+  slots_booked[slotDate].push(slotTime);
+
+  // Check user
+  const userData = await UserModel.findById(userId);
+
+  if (!userData) {
+    throw new ApiError(404, "User not found");
+  }
+
+  // Create appointment
   const appointmentData = {
     userId,
     doctorId,
     amount: doctorData.fees,
     slotDate,
-    slotTime
-    }
+    slotTime,
+  };
 
-  const newAppointment = new AppointmentModel(appointmentData)
-  await newAppointment.save()  
+  const newAppointment = await AppointmentModel.create(appointmentData);
 
-  await DoctorModel.findById(doctorId, {slots_booked})
+  // Update doctor's booked slots
+  await DoctorModel.findByIdAndUpdate(doctorId, { slots_booked });
 
-  res.status(200).json(200, null, "Appointment booked successfully")
-
-})
+  res
+    .status(201)
+    .json(
+      new ApiResponse(201, newAppointment, "Appointment booked successfully"),
+    );
+});
