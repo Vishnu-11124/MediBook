@@ -8,7 +8,7 @@ const appointmentSchema = new mongoose.Schema(
       required: true,
     },
 
-    docId: {
+    doctorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Doctor",
       required: true,

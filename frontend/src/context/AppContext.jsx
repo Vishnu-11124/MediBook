@@ -52,7 +52,7 @@ const AppContextProvider = (props) => {
   };
 
   const value = {
-    doctors, token, setToken, backendUrl, userData, setUserData, loadUserProfileData
+    doctors, getDoctorsData, token, setToken, backendUrl, userData, setUserData, loadUserProfileData
   };
 
   useEffect(() => {

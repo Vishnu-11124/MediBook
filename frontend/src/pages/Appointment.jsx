@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import RelatedDoctors from "../components/RelatedDoctors";
 import { toast } from "react-toastify";
@@ -7,7 +7,8 @@ import axios from "axios";
 
 const Appointment = () => {
   const { docId } = useParams();
-  const { backendUrl } = useContext(AppContext);
+  const { backendUrl, token } = useContext(AppContext);
+  const navigate = useNavigate();
   const [docInfo, setDocInfo] = useState(null);
   const [docAvailability, setDocAvailability] = useState(null);
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -108,7 +109,7 @@ const Appointment = () => {
         backendUrl + `/api/user/doctors/${docId}/doctor-details`,
       );
       if (data.success) {
-        console.log("doctor:", data);
+        // console.log("doctor:", data);
         setDocInfo(data?.data?.doctorData);
         setDocAvailability(data?.data?.availability);
       } else {
@@ -118,6 +119,44 @@ const Appointment = () => {
     } catch (error) {
       toast.error(error.message);
       console.log(error.message);
+    }
+  };
+
+  const bookAppointment = async () => {
+    if (!token) {
+      toast.warning("User should login!");
+      return navigate("/login");
+    }
+
+    try {
+      const date = docSlot[slotIndex][0].datetime;
+
+      let day = date.getDate();
+      let month = date.getMonth() + 1;
+      let year = date.getFullYear();
+
+      const slotDate = year + "-" + month + "-" + day;
+
+      const { data } = await axios.post(
+        backendUrl + `/api/user/doctors/${docId}/book-appointment`,
+        { slotDate, slotTime },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        navigate("/my-appointments");
+      } else {
+        console.log(data.message);
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error.message);
+      toast.error(error.message);
     }
   };
 
@@ -259,6 +298,10 @@ const Appointment = () => {
 
           {/* Button */}
           <button
+            onClick={() => {
+              bookAppointment();
+              window.scrollTo(0, 0);
+            }}
             disabled={!slotTime}
             className={`mt-8 rounded-xl px-6 py-3 font-medium transition ${
               slotTime
