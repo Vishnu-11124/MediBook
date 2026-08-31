@@ -19,89 +19,110 @@ const Appointment = () => {
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState("");
 
-  const getAvailableSlots = () => {
-    if (!docAvailability) return;
+const getAvailableSlots = () => {
+  if (!docAvailability || !docInfo) return;
 
-    let allSlots = [];
+  const allSlots = [];
+  const today = new Date();
 
-    let today = new Date();
+  for (let i = 0; i < 7; i++) {
+    const currentDate = new Date(today);
+    currentDate.setDate(today.getDate() + i);
 
-    for (let i = 0; i < 7; i++) {
-      let currentDate = new Date(today);
+    const dayName = currentDate.toLocaleDateString("en-US", {
+      weekday: "long",
+    });
 
-      currentDate.setDate(today.getDate() + i);
+    // YYYY-MM-DD
+    const dateString = [
+      currentDate.getFullYear(),
+      String(currentDate.getMonth() + 1).padStart(2, "0"),
+      String(currentDate.getDate()).padStart(2, "0"),
+    ].join("-");
 
-      const dayName = currentDate.toLocaleDateString("en-US", {
-        weekday: "long",
-      });
+    // Check leave
+    const isOnLeave = docAvailability.leaves.some((leave) => {
+      const leaveDate = new Date(leave.date);
 
-      // Current date in YYYY-MM-DD format
-      const dateString = currentDate.toISOString().split("T")[0];
+      const leaveDateString = [
+        leaveDate.getFullYear(),
+        String(leaveDate.getMonth() + 1).padStart(2, "0"),
+        String(leaveDate.getDate()).padStart(2, "0"),
+      ].join("-");
 
-      // Check doctor leave
-      const isOnLeave = docAvailability.leaves.some((leave) => {
-        const leaveDate = new Date(leave.date).toISOString().split("T")[0];
+      return leaveDateString === dateString;
+    });
 
-        return leaveDate === dateString;
-      });
+    if (isOnLeave) continue;
 
-      if (isOnLeave) {
-        continue;
-      }
+    // Get booked slots for this date
+    const bookedSlots = docInfo.slots_booked?.[dateString] || [];
 
-      let daySlots = [];
+    console.log("Date:", dateString);
+    console.log("Booked slots:", bookedSlots);
 
-      // Find all sessions for this day
-      const sessions = docAvailability.availability.filter((session) =>
-        session.days.includes(dayName),
-      );
+    // Find sessions
+    const sessions = docAvailability.availability.filter((session) =>
+      session.days.includes(dayName),
+    );
 
-      // Doctor doesn't work today
-      if (sessions.length === 0) {
-        continue;
-      }
+    if (sessions.length === 0) continue;
 
-      // Generate slots for each session
-      for (const session of sessions) {
-        const [startHour, startMinute] = session.start.split(":").map(Number);
+    let daySlots = [];
 
-        const [endHour, endMinute] = session.end.split(":").map(Number);
+    for (const session of sessions) {
+      const [startHour, startMinute] = session.start.split(":").map(Number);
 
-        let slotStart = new Date(currentDate);
+      const [endHour, endMinute] = session.end.split(":").map(Number);
 
-        slotStart.setHours(startHour, startMinute, 0, 0);
+      const slotStart = new Date(currentDate);
+      slotStart.setHours(startHour, startMinute, 0, 0);
 
-        let slotEnd = new Date(currentDate);
+      const slotEnd = new Date(currentDate);
+      slotEnd.setHours(endHour, endMinute, 0, 0);
 
-        slotEnd.setHours(endHour, endMinute, 0, 0);
+      const currentSlot = new Date(slotStart);
 
-        // Skip passed slots for today
-        if (i === 0) {
-          while (slotStart < today && slotStart < slotEnd) {
-            slotStart.setMinutes(slotStart.getMinutes() + session.slotDuration);
-          }
+      // Skip passed slots for today
+      if (i === 0) {
+        while (currentSlot < today && currentSlot < slotEnd) {
+          currentSlot.setMinutes(
+            currentSlot.getMinutes() + session.slotDuration,
+          );
         }
+      }
 
-        // Generate slots
-        while (slotStart < slotEnd) {
+      while (currentSlot < slotEnd) {
+        const slotTime = currentSlot.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        // Check whether this slot is already booked
+        const isBooked = bookedSlots.some(
+          (bookedTime) =>
+            bookedTime.trim().toLowerCase() === slotTime.trim().toLowerCase(),
+        );
+
+        if (!isBooked) {
           daySlots.push({
-            datetime: new Date(slotStart),
-
-            time: slotStart.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
+            datetime: new Date(currentSlot),
+            time: slotTime,
           });
-
-          slotStart.setMinutes(slotStart.getMinutes() + session.slotDuration);
         }
-      }
 
-      allSlots.push(daySlots);
+        currentSlot.setMinutes(currentSlot.getMinutes() + session.slotDuration);
+      }
     }
 
-    setDocSlot(allSlots);
-  };
+    // Don't add a day if every slot is booked
+    if (daySlots.length > 0) {
+      allSlots.push(daySlots);
+    }
+  }
+
+  setDocSlot(allSlots);
+};
 
   const getDoctorDetails = async () => {
     try {
@@ -165,10 +186,10 @@ const Appointment = () => {
   }, [docId]);
 
   useEffect(() => {
-    if (docAvailability) {
+    if (docAvailability && docInfo) {
       getAvailableSlots();
     }
-  }, [docAvailability]);
+  }, [docAvailability, docInfo]);
 
   // useEffect(() => {
   //   console.log(docSlot);
