@@ -7,7 +7,7 @@ import axios from "axios";
 
 const Appointment = () => {
   const { docId } = useParams();
-  const { backendUrl, token } = useContext(AppContext);
+  const { backendUrl, token, getDoctorsData } = useContext(AppContext);
   const navigate = useNavigate();
   const [docInfo, setDocInfo] = useState(null);
   const [docAvailability, setDocAvailability] = useState(null);
@@ -19,110 +19,112 @@ const Appointment = () => {
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState("");
 
-const getAvailableSlots = () => {
-  if (!docAvailability || !docInfo) return;
+  const getAvailableSlots = () => {
+    if (!docAvailability || !docInfo) return;
 
-  const allSlots = [];
-  const today = new Date();
+    const allSlots = [];
+    const today = new Date();
 
-  for (let i = 0; i < 7; i++) {
-    const currentDate = new Date(today);
-    currentDate.setDate(today.getDate() + i);
+    for (let i = 0; i < 7; i++) {
+      const currentDate = new Date(today);
+      currentDate.setDate(today.getDate() + i);
 
-    const dayName = currentDate.toLocaleDateString("en-US", {
-      weekday: "long",
-    });
+      const dayName = currentDate.toLocaleDateString("en-US", {
+        weekday: "long",
+      });
 
-    // YYYY-MM-DD
-    const dateString = [
-      currentDate.getFullYear(),
-      String(currentDate.getMonth() + 1).padStart(2, "0"),
-      String(currentDate.getDate()).padStart(2, "0"),
-    ].join("-");
-
-    // Check leave
-    const isOnLeave = docAvailability.leaves.some((leave) => {
-      const leaveDate = new Date(leave.date);
-
-      const leaveDateString = [
-        leaveDate.getFullYear(),
-        String(leaveDate.getMonth() + 1).padStart(2, "0"),
-        String(leaveDate.getDate()).padStart(2, "0"),
+      // YYYY-MM-DD
+      const dateString = [
+        currentDate.getFullYear(),
+        String(currentDate.getMonth() + 1).padStart(2, "0"),
+        String(currentDate.getDate()).padStart(2, "0"),
       ].join("-");
 
-      return leaveDateString === dateString;
-    });
+      // Check leave
+      const isOnLeave = docAvailability.leaves.some((leave) => {
+        const leaveDate = new Date(leave.date);
 
-    if (isOnLeave) continue;
+        const leaveDateString = [
+          leaveDate.getFullYear(),
+          String(leaveDate.getMonth() + 1).padStart(2, "0"),
+          String(leaveDate.getDate()).padStart(2, "0"),
+        ].join("-");
 
-    // Get booked slots for this date
-    const bookedSlots = docInfo.slots_booked?.[dateString] || [];
+        return leaveDateString === dateString;
+      });
 
-    console.log("Date:", dateString);
-    console.log("Booked slots:", bookedSlots);
+      if (isOnLeave) continue;
 
-    // Find sessions
-    const sessions = docAvailability.availability.filter((session) =>
-      session.days.includes(dayName),
-    );
+      // Get booked slots for this date
+      const bookedSlots = docInfo.slots_booked?.[dateString] || [];
 
-    if (sessions.length === 0) continue;
+      console.log("Date:", dateString);
+      console.log("Booked slots:", bookedSlots);
 
-    let daySlots = [];
+      // Find sessions
+      const sessions = docAvailability.availability.filter((session) =>
+        session.days.includes(dayName),
+      );
 
-    for (const session of sessions) {
-      const [startHour, startMinute] = session.start.split(":").map(Number);
+      if (sessions.length === 0) continue;
 
-      const [endHour, endMinute] = session.end.split(":").map(Number);
+      let daySlots = [];
 
-      const slotStart = new Date(currentDate);
-      slotStart.setHours(startHour, startMinute, 0, 0);
+      for (const session of sessions) {
+        const [startHour, startMinute] = session.start.split(":").map(Number);
 
-      const slotEnd = new Date(currentDate);
-      slotEnd.setHours(endHour, endMinute, 0, 0);
+        const [endHour, endMinute] = session.end.split(":").map(Number);
 
-      const currentSlot = new Date(slotStart);
+        const slotStart = new Date(currentDate);
+        slotStart.setHours(startHour, startMinute, 0, 0);
 
-      // Skip passed slots for today
-      if (i === 0) {
-        while (currentSlot < today && currentSlot < slotEnd) {
+        const slotEnd = new Date(currentDate);
+        slotEnd.setHours(endHour, endMinute, 0, 0);
+
+        const currentSlot = new Date(slotStart);
+
+        // Skip passed slots for today
+        if (i === 0) {
+          while (currentSlot < today && currentSlot < slotEnd) {
+            currentSlot.setMinutes(
+              currentSlot.getMinutes() + session.slotDuration,
+            );
+          }
+        }
+
+        while (currentSlot < slotEnd) {
+          const slotTime = currentSlot.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+          // Check whether this slot is already booked
+          const isBooked = bookedSlots.some(
+            (bookedTime) =>
+              bookedTime.trim().toLowerCase() === slotTime.trim().toLowerCase(),
+          );
+
+          if (!isBooked) {
+            daySlots.push({
+              datetime: new Date(currentSlot),
+              time: slotTime,
+            });
+          }
+
           currentSlot.setMinutes(
             currentSlot.getMinutes() + session.slotDuration,
           );
         }
       }
 
-      while (currentSlot < slotEnd) {
-        const slotTime = currentSlot.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-
-        // Check whether this slot is already booked
-        const isBooked = bookedSlots.some(
-          (bookedTime) =>
-            bookedTime.trim().toLowerCase() === slotTime.trim().toLowerCase(),
-        );
-
-        if (!isBooked) {
-          daySlots.push({
-            datetime: new Date(currentSlot),
-            time: slotTime,
-          });
-        }
-
-        currentSlot.setMinutes(currentSlot.getMinutes() + session.slotDuration);
+      // Don't add a day if every slot is booked
+      if (daySlots.length > 0) {
+        allSlots.push(daySlots);
       }
     }
 
-    // Don't add a day if every slot is booked
-    if (daySlots.length > 0) {
-      allSlots.push(daySlots);
-    }
-  }
-
-  setDocSlot(allSlots);
-};
+    setDocSlot(allSlots);
+  };
 
   const getDoctorDetails = async () => {
     try {
@@ -152,11 +154,11 @@ const getAvailableSlots = () => {
     try {
       const date = docSlot[slotIndex][0].datetime;
 
-      let day = date.getDate();
-      let month = date.getMonth() + 1;
-      let year = date.getFullYear();
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
 
-      const slotDate = year + "-" + month + "-" + day;
+      const slotDate = `${year}-${month}-${day}`;
 
       const { data } = await axios.post(
         backendUrl + `/api/user/doctors/${docId}/book-appointment`,
@@ -170,6 +172,7 @@ const getAvailableSlots = () => {
 
       if (data.success) {
         toast.success(data.message);
+        getDoctorsData();
         navigate("/my-appointments");
       } else {
         console.log(data.message);
