@@ -224,3 +224,28 @@ export const bookAppointment = asyncHandler(async (req, res) => {
       new ApiResponse(201, newAppointment, "Appointment booked successfully"),
     );
 });
+
+// user appointments for myappointment page
+export const getUserAppointments = asyncHandler(async (req, res) => {
+  const userId = req.userId;
+
+  const appointments = await AppointmentModel.find({ userId })
+    .populate("doctorId", "name speciality image fees")
+    .sort({ slotDate: -1, slotTime: -1 });
+
+  if (appointments.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, [], "No appointments found"));
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        appointments,
+        "Appointment list fetched successfully!",
+      ),
+    );
+});
