@@ -20,7 +20,7 @@ const MyAppointments = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (data.success) {
-        setAppointments(data?.data);
+        setAppointments(data?.data.reverse());
       } else {
         console.log(data.message);
         toast.error(data.message);
