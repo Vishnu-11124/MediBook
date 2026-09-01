@@ -39,41 +39,31 @@ const MyAppointments = () => {
     <section className="mx-auto max-w-6xl px-6 py-10">
       {/* Heading */}
       <div className="mb-8">
-        <span className="rounded-full bg-blue-100 px-4 py-1 text-sm font-medium text-blue-600">
+        <span className="inline-block rounded-full bg-blue-100 px-4 py-1 text-sm font-medium text-blue-600">
           My Bookings
         </span>
 
-        <div>
+        <div className="mt-4 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          {/* Heading */}
           <div>
-            {openHistory ? (
-              <div>
-                <h1 className="mt-4 text-4xl font-bold text-slate-900">
-                  My Appointments
-                </h1>
+            <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
+              {openHistory ? "Appointment History" : "My Appointments"}
+            </h1>
 
-                <p className="mt-2 text-slate-600">
-                  View and manage your upcoming doctor appointments.
-                </p>
-              </div>
-            ) : (
-              <div>
-                <h1 className="mt-4 text-4xl font-bold text-slate-900">
-                  My Appointments
-                </h1>
+            <p className="mt-2 text-sm text-slate-600 sm:text-base">
+              {openHistory
+                ? "View your previous doctor appointments."
+                : "View and manage your upcoming doctor appointments."}
+            </p>
+          </div>
 
-                <p className="mt-2 text-slate-600">
-                  View and manage your upcoming doctor appointments.
-                </p>
-              </div>
-            )}
-          </div>
-          <div>
-            {openHistory ? (
-              <button onClick={() => setOpenHistory(false)}>Bookings</button>
-            ) : (
-              <button onClick={() => setOpenHistory(true)}>History</button>
-            )}
-          </div>
+          {/* Toggle button */}
+          <button
+            onClick={() => setOpenHistory(!openHistory)}
+            className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-blue-100 transition-all hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-100"
+          >
+            {openHistory ? "View Bookings" : "View History"}
+          </button>
         </div>
       </div>
 
