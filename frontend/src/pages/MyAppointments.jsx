@@ -4,12 +4,15 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 import axios from "axios";
+import { CalendarDays } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const MyAppointments = () => {
   const { backendUrl, token } = useContext(AppContext);
+  const navigate = useNavigate();
 
   const [appointments, setAppointments] = useState([]);
-  const [openHistory, setOpenHistory] = useState(false)
+  const [openHistory, setOpenHistory] = useState(false);
 
   const getUserAppointments = async () => {
     try {
@@ -75,8 +78,26 @@ const MyAppointments = () => {
       </div>
 
       {appointments.length === 0 ? (
-        <div>
-          <p>You have no upcoming appointments.</p>
+        <div className="flex flex-col items-center justify-center text-center py-16 px-4 bg-white rounded-xl border border-gray-100">
+          <div className="w-14 h-14 flex items-center justify-center rounded-full bg-gray-50 mb-4">
+            <CalendarDays className="w-7 h-7 text-gray-400" />
+          </div>
+
+          <h2 className="text-lg font-medium text-gray-800">
+            No upcoming appointments
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-2 max-w-sm">
+            You don't have any upcoming appointments. Book an appointment with a
+            doctor to get started.
+          </p>
+
+          <button
+            onClick={() => navigate("/doctors")}
+            className="mt-6 px-6 py-2.5 text-sm text-white bg-black rounded-lg hover:bg-primary/90 transition"
+          >
+            Book an Appointment
+          </button>
         </div>
       ) : (
         <div className="space-y-6">
