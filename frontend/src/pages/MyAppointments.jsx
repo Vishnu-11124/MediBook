@@ -15,6 +15,7 @@ const MyAppointments = () => {
   const [historyAppointments, setHistoryAppointments] = useState([]);
   const [openHistory, setOpenHistory] = useState(false);
 
+  console.log("data:", historyAppointments)
   const getAppointments = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/user/appointments", {
@@ -81,14 +82,14 @@ const MyAppointments = () => {
         </div>
       </div>
 
-      {appointments.length === 0 ? (
+      {appointments.length === 0 && historyAppointments.length === 0 ? (
         <div className="flex flex-col items-center justify-center text-center py-16 px-4 bg-white rounded-xl border border-gray-100">
           <div className="w-14 h-14 flex items-center justify-center rounded-full bg-gray-50 mb-4">
             <CalendarDays className="w-7 h-7 text-gray-400" />
           </div>
 
           <h2 className="text-lg font-medium text-gray-800">
-            No upcoming appointments
+            No appointments found
           </h2>
 
           <p className="text-sm text-gray-500 mt-2 max-w-sm">
