@@ -12,27 +12,41 @@ const MyAppointments = () => {
   const navigate = useNavigate();
 
   const [appointments, setAppointments] = useState([]);
+  const [historyAppointments, setHistoryAppointments] = useState([]);
   const [openHistory, setOpenHistory] = useState(false);
 
-  const getUserAppointments = async () => {
+  const getAppointments = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/user/appointments", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      if (data.success) {
-        setAppointments(data?.data.reverse());
-      } else {
-        console.log(data.message);
-        toast.error(data.message);
-      }
+
+      const appointments = data.data;
+
+      setAppointments(
+        appointments.filter(
+          (appointment) =>
+            appointment.status === "pending" ||
+            appointment.status === "confirmed",
+        ),
+      );
+
+      setHistoryAppointments(
+        appointments.filter(
+          (appointment) =>
+            appointment.status === "completed" ||
+            appointment.status === "cancelled",
+        ),
+      );
     } catch (error) {
-      console.log(error.message);
-      toast.error("Failed to fetch appointments");
+      console.log(error);
     }
   };
 
   useEffect(() => {
-    getUserAppointments();
+    getAppointments();
   }, [token]);
 
   return (
@@ -88,6 +102,60 @@ const MyAppointments = () => {
           >
             Book an Appointment
           </button>
+        </div>
+      ) : openHistory ? (
+        <div className="space-y-6">
+          {historyAppointments.map((doc) => (
+            <div
+              key={doc._id}
+              className="rounded-3xl border border-slate-200 bg-white p-6 transition hover:border-blue-200 hover:shadow-md"
+            >
+              <div className="flex items-center gap-6">
+                {/* Doctor Image - Left */}
+                <div className="shrink-0">
+                  <img
+                    src={doc.doctorId.image}
+                    alt={doc.doctorId.name}
+                    className="h-32 w-32 rounded-2xl bg-blue-50 object-cover"
+                  />
+                </div>
+
+                {/* Details - Right */}
+                <div className="flex flex-1 flex-col gap-2">
+                  {/* Doctor Name */}
+                  <h2 className="text-xl font-bold text-slate-900">
+                    {doc.doctorId.name}
+                  </h2>
+
+                  {/* Speciality */}
+                  <p className="font-medium text-blue-600">
+                    {doc.doctorId.speciality}
+                  </p>
+
+                  {/* Appointment Date */}
+                  <p className="mt-2 text-sm text-slate-600">
+                    <span className="font-semibold text-slate-800">
+                      Appointment Date:
+                    </span>{" "}
+                    {doc.slotDate}
+                  </p>
+
+                  {/* Status */}
+                  <span
+                    className={`mt-1 w-fit rounded-full px-3 py-1 text-xs font-medium ${
+                      doc.status === "completed"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {doc.status === "completed"
+                      ? "Appointment Completed"
+                      : "Appointment Cancelled"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="space-y-6">
