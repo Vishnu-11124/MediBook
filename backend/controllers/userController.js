@@ -252,25 +252,68 @@ export const getUserAppointments = asyncHandler(async (req, res) => {
 
 export const cancelAppointment = asyncHandler(async (req, res) => {
   const userId = req.userId;
-  const { appointmentId } = req.body
+  const { appointmentId } = req.body;
 
-  const appointmentData = await AppointmentModel.findById(appointmentId)
+  if (!appointmentId) {
+    throw new ApiError(400, "Appointment ID is required");
+  }
 
-  if(appointmentData.userId.toString() !== userId){
-    throw new ApiError(403, "You are not authorized to cancel this appointment")
-  } 
+  // Find appointment
+  const appointmentData = await AppointmentModel.findById(appointmentId);
 
-  await AppointmentModel.findByIdAndUpdate(appointmentId, { status: "cancelled"})
+  if (!appointmentData) {
+    throw new ApiError(404, "Appointment not found");
+  }
 
-  const {doctorId, slotDate, slotTime} = appointmentData
-  
-  const doctorData = await DoctorModel.findById(doctorId)
+  // Check ownership
+  if (appointmentData.userId.toString() !== userId) {
+    throw new ApiError(
+      403,
+      "You are not authorized to cancel this appointment",
+    );
+  }
 
-  let slots_booked = doctorData.slots_booked
+  // Check current status
+  if (appointmentData.status === "cancelled") {
+    throw new ApiError(400, "Appointment is already cancelled");
+  }
 
-  slots_booked[slotDate] = slots_booked[slotDate].filter(slot => slot !== slotTime)
+  if (appointmentData.status === "completed") {
+    throw new ApiError(400, "Completed appointment cannot be cancelled");
+  }
 
-  await DoctorModel.findByIdAndUpdate(doctorId, { slots_booked })
+  const { doctorId, slotDate, slotTime } = appointmentData;
 
-  res.status(200).json(new ApiResponse(200, null, "Appointment cancelled successfully"))
-})
+  // Find doctor
+  const doctorData = await DoctorModel.findById(doctorId);
+
+  if (!doctorData) {
+    throw new ApiError(404, "Doctor not found");
+  }
+
+  // Remove booked slot
+  const slots_booked = doctorData.slots_booked;
+
+  if (slots_booked[slotDate]) {
+    slots_booked[slotDate] = slots_booked[slotDate].filter(
+      (slot) => slot !== slotTime,
+    );
+
+    // Remove empty date
+    if (slots_booked[slotDate].length === 0) {
+      delete slots_booked[slotDate];
+    }
+  }
+
+  // Update appointment status
+  await AppointmentModel.findByIdAndUpdate(appointmentId, {
+    status: "cancelled",
+  });
+
+  // Update doctor's booked slots
+  await DoctorModel.findByIdAndUpdate(doctorId, { slots_booked });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, null, "Appointment cancelled successfully"));
+});
