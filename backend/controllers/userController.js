@@ -249,3 +249,28 @@ export const getUserAppointments = asyncHandler(async (req, res) => {
       ),
     );
 });
+
+export const cancelAppointment = asyncHandler(async (req, res) => {
+  const userId = req.userId;
+  const { appointmentId } = req.body
+
+  const appointmentData = await AppointmentModel.findById(appointmentId)
+
+  if(appointmentData.userId.toString() !== userId){
+    throw new ApiError(403, "You are not authorized to cancel this appointment")
+  } 
+
+  await AppointmentModel.findByIdAndUpdate(appointmentId, { status: "cancelled"})
+
+  const {doctorId, slotDate, slotTime} = appointmentData
+  
+  const doctorData = await DoctorModel.findById(doctorId)
+
+  let slots_booked = doctorData.slots_booked
+
+  slots_booked[slotDate] = slots_booked[slotDate].filter(slot => slot !== slotTime)
+
+  await DoctorModel.findByIdAndUpdate(doctorId, { slots_booked })
+
+  res.status(200).json(new ApiResponse(200, null, "Appointment cancelled successfully"))
+})
