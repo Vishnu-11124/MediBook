@@ -46,6 +46,26 @@ const MyAppointments = () => {
     }
   };
 
+  const cancelAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.put(
+        backendUrl + "/api/user/appointments/cancel-appointment",
+        { appointmentId },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getAppointments();
+      } else {
+        console.log(data.message);
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error.messasge);
+      toast.error(error.message);
+    }
+  };
+
   useEffect(() => {
     getAppointments();
   }, [token]);
@@ -218,7 +238,9 @@ const MyAppointments = () => {
                     Pay Online
                   </button>
 
-                  <button className="rounded-xl border border-red-200 py-3 font-medium text-red-600 transition hover:bg-red-50">
+                  <button
+                  onClick={() => cancelAppointment(doc._id)}
+                   className="rounded-xl border border-red-200 py-3 font-medium text-red-600 transition hover:bg-red-50">
                     Cancel Appointment
                   </button>
                 </div>
