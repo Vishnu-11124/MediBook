@@ -25,6 +25,7 @@ const MyAppointments = () => {
       });
 
       const appointments = data.data;
+      console.log(data.data)
 
       setAppointments(
         appointments.filter(
@@ -227,7 +228,7 @@ const MyAppointments = () => {
                     </p>
 
                     <p className="mt-1 font-medium text-slate-800">
-                      25 July 2026 • 09:30 AM
+                      {doc.slotDate} <span className="mx-2">|</span> {doc.slotTime}
                     </p>
                   </div>
                 </div>
