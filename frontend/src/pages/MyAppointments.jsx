@@ -102,7 +102,7 @@ const MyAppointments = () => {
         </div>
       </div>
 
-      {appointments.length === 0 && historyAppointments.length === 0 ? (
+      {appointments.length === 0 && !openHistory ? (
         <div className="flex flex-col items-center justify-center text-center py-16 px-4 bg-white rounded-xl border border-gray-100">
           <div className="w-14 h-14 flex items-center justify-center rounded-full bg-gray-50 mb-4">
             <CalendarDays className="w-7 h-7 text-gray-400" />
