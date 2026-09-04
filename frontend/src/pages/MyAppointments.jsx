@@ -61,7 +61,7 @@ const MyAppointments = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      console.log(error.messasge);
+      console.log(error.message);
       toast.error(error.message);
     }
   };
