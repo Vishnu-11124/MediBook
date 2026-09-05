@@ -15,7 +15,7 @@ const MyAppointments = () => {
   const [historyAppointments, setHistoryAppointments] = useState([]);
   const [openHistory, setOpenHistory] = useState(false);
 
-  console.log("data:", historyAppointments)
+  // console.log("data:", historyAppointments)
   const getAppointments = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/user/appointments", {
@@ -25,7 +25,7 @@ const MyAppointments = () => {
       });
 
       const appointments = data.data;
-      console.log(data.data)
+      // console.log(data.data)
 
       setAppointments(
         appointments.filter(
@@ -61,6 +61,15 @@ const MyAppointments = () => {
         console.log(data.message);
         toast.error(data.message);
       }
+    } catch (error) {
+      console.log(error.message);
+      toast.error(error.message);
+    }
+  };
+
+  const handlePayment = async (appointmentId) => {
+    try {
+      console.log("id", appointmentId);
     } catch (error) {
       console.log(error.message);
       toast.error(error.message);
@@ -228,20 +237,28 @@ const MyAppointments = () => {
                     </p>
 
                     <p className="mt-1 font-medium text-slate-800">
-                      {doc.slotDate} <span className="mx-2">|</span> {doc.slotTime}
+                      {doc.slotDate} <span className="mx-2">|</span>{" "}
+                      {doc.slotTime}
                     </p>
                   </div>
                 </div>
 
                 {/* Buttons */}
                 <div className="flex flex-col justify-end gap-3 md:w-52">
-                  <button className="rounded-xl bg-blue-600 py-3 font-medium text-white transition hover:bg-blue-700">
-                    Pay Online
-                  </button>
+                  {doc.status === "completed" ? (
+                    <p>Payment Completed</p>
+                  ) : (
+                    <button
+                    onClick={() => handlePayment(doc._id)}
+                     className="rounded-xl bg-blue-600 py-3 font-medium text-white transition hover:bg-blue-700">
+                      Pay Online
+                    </button>
+                  )}
 
                   <button
-                  onClick={() => cancelAppointment(doc._id)}
-                   className="rounded-xl border border-red-200 py-3 font-medium text-red-600 transition hover:bg-red-50">
+                    onClick={() => cancelAppointment(doc._id)}
+                    className="rounded-xl border border-red-200 py-3 font-medium text-red-600 transition hover:bg-red-50"
+                  >
                     Cancel Appointment
                   </button>
                 </div>
