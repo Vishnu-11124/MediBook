@@ -10,7 +10,7 @@ import fs from "fs/promises";
 import DoctorModel from "../models/doctorModel.js";
 import DoctorAvailabilityModel from "../models/availabilityModel.js";
 import AppointmentModel from "../models/appointmentModel.js";
-import razorpay from 'razorpay'
+import razorpay from "razorpay";
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -321,9 +321,59 @@ export const cancelAppointment = asyncHandler(async (req, res) => {
 
 const razorpayInstance = new razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
-})
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 export const paymentRazorpay = asyncHandler(async (req, res) => {
+  const userId = req.userId;
+  const { appointmentId } = req.body;
 
-})
+  if (!appointmentId) {
+    throw new ApiError(400, "Appointment ID is required");
+  }
+
+  const appointmentData = await AppointmentModel.findById(appointmentId);
+
+  if (!appointmentData) {
+    throw new ApiError(404, "Appointment not found");
+  }
+
+  // Check appointment ownership
+  if (appointmentData.userId.toString() !== userId) {
+    throw new ApiError(
+      403,
+      "You are not authorized to pay for this appointment",
+    );
+  }
+
+  // Check appointment status
+  if (appointmentData.status === "cancelled") {
+    throw new ApiError(400, "Cancelled appointment cannot be paid");
+  }
+
+  if (appointmentData.status === "completed") {
+    throw new ApiError(400, "Completed appointment cannot be paid");
+  }
+
+  // Check payment status
+  if (appointmentData.paymentStatus === "paid") {
+    throw new ApiError(400, "Appointment is already paid");
+  }
+
+  const options = {
+    amount: appointmentData.amount * 100,
+    currency: process.env.CURRENCY,
+    receipt: appointmentId,
+  };
+
+  const order = await razorpayInstance.orders.create(options);
+
+  // Store Razorpay order ID
+  await AppointmentModel.findByIdAndUpdate(appointmentId, {
+    razorpayOrderId: order.id,
+  });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, order, "Razorpay order created successfully"));
+});
