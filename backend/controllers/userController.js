@@ -10,6 +10,7 @@ import fs from "fs/promises";
 import DoctorModel from "../models/doctorModel.js";
 import DoctorAvailabilityModel from "../models/availabilityModel.js";
 import AppointmentModel from "../models/appointmentModel.js";
+import razorpay from 'razorpay'
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -317,3 +318,12 @@ export const cancelAppointment = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, null, "Appointment cancelled successfully"));
 });
+
+const razorpayInstance = new razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+})
+
+export const paymentRazorpay = asyncHandler(async (req, res) => {
+
+})
