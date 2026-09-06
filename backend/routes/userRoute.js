@@ -22,6 +22,6 @@ userRouter.get('/appointments', authUser, getUserAppointments)
 
 userRouter.put('/appointments/cancel-appointment', authUser, cancelAppointment)
 
-userRouter.post('/payment-razorpay', authUser, paymentRazorpay)
+userRouter.post('/appointments/payment-razorpay', authUser, paymentRazorpay)
 
 export default userRouter
