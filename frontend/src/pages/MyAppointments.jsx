@@ -69,7 +69,17 @@ const MyAppointments = () => {
 
   const handlePayment = async (appointmentId) => {
     try {
-      const {data} = await axios.post(backendUrl + '/api/user/')
+      const { data } = await axios.post(
+        backendUrl + "/api/user/appointments/payment-razorpay",
+        { appointmentId },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (data.success) {
+        console.log(data);
+      } else {
+        console.log(data.message);
+        toast.error(data.message);
+      }
     } catch (error) {
       console.log(error.message);
       toast.error(error.message);
@@ -245,16 +255,21 @@ const MyAppointments = () => {
 
                 {/* Buttons */}
                 <div className="flex flex-col justify-end gap-3 md:w-52">
-                  {doc.status === "completed" ? (
-                    <p>Payment Completed</p>
+                  {doc.paymentStatus === "paid" ? (
+                    <div className="flex items-center justify-center gap-2 rounded-xl border border-green-200 bg-green-50 py-3 font-medium text-green-700">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-600 text-xs text-white">
+                        ✓
+                      </span>
+                      Payment Completed
+                    </div>
                   ) : (
                     <button
-                    onClick={() => handlePayment(doc._id)}
-                     className="rounded-xl bg-blue-600 py-3 font-medium text-white transition hover:bg-blue-700">
+                      onClick={() => handlePayment(doc._id)}
+                      className="rounded-xl bg-blue-600 py-3 font-medium text-white transition hover:bg-blue-700"
+                    >
                       Pay Online
                     </button>
                   )}
-
                   <button
                     onClick={() => cancelAppointment(doc._id)}
                     className="rounded-xl border border-red-200 py-3 font-medium text-red-600 transition hover:bg-red-50"
