@@ -69,7 +69,7 @@ const MyAppointments = () => {
 
   const handlePayment = async (appointmentId) => {
     try {
-      console.log("id", appointmentId);
+      const {data} = await axios.post(backendUrl + '/api/user/')
     } catch (error) {
       console.log(error.message);
       toast.error(error.message);
