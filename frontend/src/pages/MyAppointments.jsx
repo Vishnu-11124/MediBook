@@ -76,8 +76,20 @@ const MyAppointments = () => {
       description: "Appointment Payment",
       order_id: order.id,
       receipt: order.receipt,
-      handler: async (res) => {
-        console.log(res);
+      handler: async (response) => {      
+        try {
+          const {data} = await axios.post(backendUrl + '/api/user/appointments/payment-verify',response,{ headers: {Authorization: `Bearer ${token}` }})
+          if(data.successs){
+            getAppointments();
+            navigate('/my-appointments');
+            toast.success(data.message);
+          }else{
+            toast.error(data.message)
+          }
+        } catch (error) {
+          toast.error(error.message)
+          console.log(error.message)
+        }
       },
     };
 
