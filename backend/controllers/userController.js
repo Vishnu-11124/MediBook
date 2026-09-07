@@ -377,3 +377,22 @@ export const paymentRazorpay = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, order, "Razorpay order created successfully"));
 });
+
+export const verifyPayment = asyncHandler(async (req, res) => {
+  const { razorpay_order_id } = req.body;
+  const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
+  if (!orderInfo) {
+    throw new ApiError(404, "Order not found");
+  }
+
+  if (orderInfo.status === "paid") {
+    await AppointmentModel.findByIdAndUpdate(orderInfo.receipt, {
+      paymentStatus: "paid",
+    });
+    res
+      .status(200)
+      .json(new ApiResponse(200, null, "Payment verified successfully"));
+  } else {
+    throw new ApiError(400, "Payment failed");
+  }
+});
