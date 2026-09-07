@@ -67,6 +67,24 @@ const MyAppointments = () => {
     }
   };
 
+  const initPay = (order) => {
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currency,
+      name: "MediBook",
+      description: "Appointment Payment",
+      order_id: order.id,
+      receipt: order.receipt,
+      handler: async (res) => {
+        console.log(res);
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
   const handlePayment = async (appointmentId) => {
     try {
       const { data } = await axios.post(
@@ -75,7 +93,7 @@ const MyAppointments = () => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
       if (data.success) {
-        console.log(data);
+        initPay(data.data);
       } else {
         console.log(data.message);
         toast.error(data.message);
