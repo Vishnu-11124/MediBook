@@ -79,7 +79,7 @@ const MyAppointments = () => {
       handler: async (response) => {      
         try {
           const {data} = await axios.post(backendUrl + '/api/user/appointments/payment-verify',response,{ headers: {Authorization: `Bearer ${token}` }})
-          if(data.successs){
+          if(data.success){
             getAppointments();
             navigate('/my-appointments');
             toast.success(data.message);
