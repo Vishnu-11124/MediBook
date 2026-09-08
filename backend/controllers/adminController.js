@@ -1,3 +1,4 @@
+import AppointmentModel from "../models/appointmentModel.js";
 import DoctorAvailabilityModel from "../models/availabilityModel.js";
 import DoctorModel from "../models/doctorModel.js";
 import LeaveModel from "../models/leaveModel.js";
@@ -256,4 +257,27 @@ export const doctorDetails = asyncHandler(async (req, res) => {
       "Doctor details fetched successfully",
     ),
   );
+});
+
+// all appointments list
+export const allAppointments = asyncHandler(async (req, res) => {
+  const appointmentsList = await AppointmentModel.find({})
+    .populate("doctorId", "name speciality")
+    .populate("userId", "name");
+
+  if (appointmentsList.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, [], "No appointments found"));
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        appointmentsList,
+        "Successfully fetched all appointments list",
+      ),
+    );
 });
