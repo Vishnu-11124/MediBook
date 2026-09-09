@@ -60,6 +60,7 @@ const AdminContextProvider = (props) => {
         backendUrl + "/api/admin/dashboard-data",
         { headers: { Authorization: `Bearer ${token}` } },
       );
+      console.log("dashboard data", data);
       if (data.success) {
         setDashboardData(data?.data);
       } else {
