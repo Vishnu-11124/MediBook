@@ -2,6 +2,7 @@ import AppointmentModel from "../models/appointmentModel.js";
 import DoctorAvailabilityModel from "../models/availabilityModel.js";
 import DoctorModel from "../models/doctorModel.js";
 import LeaveModel from "../models/leaveModel.js";
+import UserModel from "../models/userModel.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
@@ -278,6 +279,36 @@ export const allAppointments = asyncHandler(async (req, res) => {
         200,
         appointmentsList,
         "Successfully fetched all appointments list",
+      ),
+    );
+});
+
+// admin dashboard data
+export const adminDashboardData = asyncHandler(async (req, res) => {
+  const totalDoctors = await DoctorModel.countDocuments();
+  const totalUsers = await UserModel.countDocuments();
+  const totalAppointments = await AppointmentModel.countDocuments();
+
+  const latestAppointments = await AppointmentModel.find({})
+    .populate("doctorId", "name speciality")
+    .populate("userId", "name")
+    .sort({ createdAt: -1 })
+    .limit(5);
+
+  const dashboardData = {
+    totalDoctors,
+    totalUsers,
+    totalAppointments,
+    latestAppointments,
+  };
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        dashboardData,
+        "Successfully fetched dashboard data",
       ),
     );
 });
