@@ -3,6 +3,7 @@ import { ShieldCheck, Stethoscope } from "lucide-react";
 import { AdminContext } from "../context/AdminContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { DoctorContext } from "../context/DoctorContext";
 
 const Login = () => {
   const [state, setState] = useState("Admin");
@@ -10,7 +11,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   const { setToken, backendUrl } = useContext(AdminContext);
-
+  const { dToken, setDToken } = useContext(DoctorContext);
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
@@ -37,7 +38,22 @@ const Login = () => {
           localStorage.setItem("token", data.data.token);
           setToken(data.data.token);
         }
+        {
+          toast.error(data.message);
+        }
       } else {
+        const { data } = await axios.post(
+          backendUrl + "/api/doctor/doctor-login",
+          { email: email.trim(), password },
+        );
+
+        if (data.success) {
+          localStorage.setItem("dToken", data.data.token);
+          setDToken(data.data.token);
+          console.log(data.data.token);
+        } else {
+          toast.error(data.message);
+        }
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Invalid email or password");
