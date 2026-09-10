@@ -13,11 +13,13 @@ import AddDoctor from "./pages/Admin/AddDoctor";
 import DoctorsList from "./pages/Admin/DoctorsList";
 import LeaveRequests from "./pages/Admin/LeaveRequests";
 import DoctorDetails from "./pages/Admin/DoctorDetails";
+import { DoctorContext } from "./context/DoctorContext";
 
 const App = () => {
   const { token } = useContext(AdminContext);
+  const { dToken } = useContext(DoctorContext)
 
-  return token ? (
+  return token || dToken ? (
     <div className="min-h-screen bg-slate-50">
       <ToastContainer />
 
