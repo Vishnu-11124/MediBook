@@ -1,3 +1,4 @@
+import AppointmentModel from "../models/appointmentModel.js";
 import DoctorModel from "../models/doctorModel.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -70,4 +71,32 @@ export const doctorLogin = asyncHandler(async (req, res) => {
       "Doctor logged in successfully",
     ),
   );
+});
+
+export const allAppointmentsDoctor = asyncHandler(async (req, res) => {
+  const doctorId = req.doctorId;
+
+  if (!doctorId) {
+    throw new ApiError(401, "Doctor authentication required");
+  }
+
+  const appointmentList = await AppointmentModel.find({ doctorId })
+    .populate("userId", "name image dob gender")
+    .sort({ slotDate: -1, slotTime: -1 });
+
+  if (appointmentList.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, [], "Appointment list is empty"));
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        appointmentList,
+        "Appointment list successfully fetched",
+      ),
+    );
 });
