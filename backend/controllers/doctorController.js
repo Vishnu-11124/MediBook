@@ -71,3 +71,4 @@ export const doctorLogin = asyncHandler(async (req, res) => {
     ),
   );
 });
+
