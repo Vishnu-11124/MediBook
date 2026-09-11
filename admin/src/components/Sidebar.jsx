@@ -1,12 +1,21 @@
 import React, { useContext } from "react";
 import { AdminContext } from "../context/AdminContext";
+import { DoctorContext } from "../context/DoctorContext";
 import { NavLink } from "react-router-dom";
-import { Calendar, Home, Plus, Users, CalendarClock } from "lucide-react";
+import {
+  Calendar,
+  Home,
+  Plus,
+  Users,
+  CalendarClock,
+  CircleUserRound,
+} from "lucide-react";
 
 const Sidebar = () => {
   const { token } = useContext(AdminContext);
+  const { dToken } = useContext(DoctorContext);
 
-  const menuItems = [
+  const adminMenuItems = [
     {
       name: "Dashboard",
       path: "/admin-dashboard",
@@ -29,18 +38,46 @@ const Sidebar = () => {
     },
     {
       name: "Leave Requests",
-      path:"/leave-requests",
+      path: "/leave-requests",
       icon: CalendarClock,
-    }
+    },
   ];
+
+  const doctorMenuItems = [
+    {
+      name: "Dashboard",
+      path: "/doctor-dashboard",
+      icon: Home,
+    },
+    {
+      name: "Appointments",
+      path: "/doctor-appointments",
+      icon: Calendar,
+    },
+    {
+      name: "Profile",
+      path: "/doctor-profile",
+      icon: CircleUserRound,
+    },
+    {
+      name: "Leave Requests",
+      path: "/doctor-leave-applications",
+      icon: CalendarClock,
+    },
+  ];
+
+  // Select menu based on logged-in user
+  const menuItems = token ? adminMenuItems : dToken ? doctorMenuItems : [];
+
+  const sectionTitle = token ? "Management" : dToken ? "Doctor Panel" : "";
 
   return (
     <aside className="w-64 min-h-[calc(100vh-4rem)] bg-white border-r border-slate-200">
-      {token && (
+      {(token || dToken) && (
         <div className="p-4">
           {/* Section title */}
           <p className="px-3 mb-3 text-xs font-medium uppercase tracking-wider text-slate-400">
-            Management
+            {sectionTitle}
           </p>
 
           {/* Navigation */}

@@ -14,10 +14,14 @@ import DoctorsList from "./pages/Admin/DoctorsList";
 import LeaveRequests from "./pages/Admin/LeaveRequests";
 import DoctorDetails from "./pages/Admin/DoctorDetails";
 import { DoctorContext } from "./context/DoctorContext";
+import DoctorDashboard from "./pages/Doctor/DoctorDashboard";
+import DoctorAppointments from "./pages/Doctor/DoctorAppointments";
+import DoctorProfile from "./pages/Doctor/DoctorProfile";
+import LeaveApplications from "./pages/Doctor/LeaveApplications";
 
 const App = () => {
   const { token } = useContext(AdminContext);
-  const { dToken } = useContext(DoctorContext)
+  const { dToken } = useContext(DoctorContext);
 
   return token || dToken ? (
     <div className="min-h-screen bg-slate-50">
@@ -34,6 +38,7 @@ const App = () => {
         {/* Page Content */}
         <main className="flex-1 min-w-0 p-5 sm:p-8">
           <Routes>
+            {/* Admin Route */}
             <Route path="/" element={<></>} />
             <Route path="/admin-dashboard" element={<Dashboard />} />
             <Route path="/all-appointments" element={<AllAppointments />} />
@@ -41,6 +46,18 @@ const App = () => {
             <Route path="/doctor-list" element={<DoctorsList />} />
             <Route path="/leave-requests" element={<LeaveRequests />} />
             <Route path="/doctor-list/:doctorId" element={<DoctorDetails />} />
+
+            {/* Doctor Route */}
+            <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+            <Route
+              path="/doctor-appointments"
+              element={<DoctorAppointments />}
+            />
+            <Route path="/doctor-profile" element={<DoctorProfile />} />
+            <Route
+              path="/doctor-leave-applications"
+              element={<LeaveApplications />}
+            />
           </Routes>
         </main>
       </div>
