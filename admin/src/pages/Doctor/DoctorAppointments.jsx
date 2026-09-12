@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { DoctorContext } from "../../context/DoctorContext";
 import { useEffect } from "react";
 import { useState } from "react";
+import { CalendarDays, LucideIndianRupee } from "lucide-react";
 
 const DoctorAppointments = () => {
   const { appointmentsList, dToken, getAppointments, appointmentHistory } =
@@ -186,7 +187,174 @@ const DoctorAppointments = () => {
             </div>
           ) : (
             // current appointments
-            <div></div>
+            <div>
+              {appointmentsList.length === 0 ? (
+                <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-10 text-center">
+                  <div className="flex justify-center mb-3">
+                    <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
+                      <CalendarDays
+                        size={22}
+                        strokeWidth={1.7}
+                        className="text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <p className="text-sm font-medium text-slate-700">
+                    Currently no appointments are available
+                  </p>
+
+                  <p className="text-xs text-slate-400 mt-1">
+                    New appointments will appear here
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[1000px]">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-200">
+                          <th className="px-5 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                            #
+                          </th>
+
+                          <th className="px-5 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                            Patient
+                          </th>
+
+                          <th className="px-5 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                            Payment
+                          </th>
+
+                          <th className="px-5 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                            Age
+                          </th>
+
+                          <th className="px-5 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                            Date & Time
+                          </th>
+
+                          <th className="px-5 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                            Fees
+                          </th>
+
+                          <th className="px-5 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                            Action
+                          </th>
+                        </tr>
+                      </thead>
+
+                      <tbody className="divide-y divide-slate-100">
+                        {appointmentsList.map((data, i) => (
+                          <tr
+                            key={data._id}
+                            className="hover:bg-slate-50/70 transition"
+                          >
+                            <td className="px-5 py-4 text-sm text-slate-500">
+                              {i + 1}
+                            </td>
+
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-3">
+                                <img
+                                  src={data.userId.image}
+                                  alt="patient image"
+                                  className="w-10 h-10 rounded-full object-cover"
+                                />
+
+                                <p className="text-sm font-medium text-slate-700">
+                                  {data.userId.name}
+                                </p>
+                              </div>
+                            </td>
+
+                            <td className="px-5 py-4">
+                              <span
+                                className={`
+                      inline-flex items-center
+                      px-2.5 py-1
+                      rounded-full
+                      text-xs font-medium
+                      ${
+                        data.paymentStatus
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-slate-100 text-slate-600"
+                      }
+                    `}
+                              >
+                                {data.paymentStatus ? "Online" : "CASH"}
+                              </span>
+                            </td>
+
+                            <td className="px-5 py-4 text-sm text-slate-600">
+                              {ageCalculator(data.userId.dob)}
+                            </td>
+
+                            <td className="px-5 py-4">
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium text-slate-700">
+                                  {data.slotDate}
+                                </span>
+                                <span className="text-xs text-slate-500 mt-0.5">
+                                  {data.slotTime}
+                                </span>
+                              </div>
+                            </td>
+
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-1 text-sm font-medium text-slate-700">
+                                <LucideIndianRupee
+                                  size={15}
+                                  strokeWidth={1.8}
+                                />
+                                {data.amount}
+                              </div>
+                            </td>
+
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  className="
+                        flex items-center gap-1.5
+                        px-3 py-1.5
+                        rounded-lg
+                        text-xs font-medium
+                        text-red-600
+                        bg-red-50
+                        hover:bg-red-100
+                        transition
+                        cursor-pointer
+                      "
+                                >
+                                  Cancel
+                                </button>
+
+                                <button
+                                  type="button"
+                                  className="
+                        px-3 py-1.5
+                        rounded-lg
+                        text-xs font-medium
+                        text-emerald-700
+                        bg-emerald-50
+                        hover:bg-emerald-100
+                        transition
+                        cursor-pointer
+                      "
+                                >
+                                  Completed
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
