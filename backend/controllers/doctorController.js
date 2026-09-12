@@ -140,3 +140,43 @@ export const appointmentCompleted = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, [], "Appointment successfully completed"));
 });
+
+export const cancelAppointment = asyncHandler(async (req, res) => {
+  const doctorId = req.doctorId;
+
+  if (!doctorId) {
+    throw new ApiError(401, "Doctor authentication required");
+  }
+
+  const { appointmentId } = req.body;
+
+  if (!appointmentId) {
+    throw new ApiError(400, "AppointmentId is required");
+  }
+
+  const appointmentData = await AppointmentModel.findById(appointmentId);
+
+  if (!appointmentData) {
+    throw new ApiError(404, "Appointment not found");
+  }
+
+  if (appointmentData.doctorId.toString() !== doctorId.toString()) {
+    throw new ApiError(403, "You cannot make changes to this appointment");
+  }
+
+  if (appointmentData.status === "cancelled") {
+    throw new ApiError(400, "Cancelled appointment cannot be completed");
+  }
+
+  if (appointmentData.status === "completed") {
+    throw new ApiError(400, "Appointment is already completed");
+  }
+
+  await AppointmentModel.findByIdAndUpdate(appointmentId, {
+    status: "cancelled",
+  });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, [], "Appointment successfully cancelled"));
+});
