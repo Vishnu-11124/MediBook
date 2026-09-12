@@ -165,7 +165,7 @@ export const cancelAppointment = asyncHandler(async (req, res) => {
   }
 
   if (appointmentData.status === "cancelled") {
-    throw new ApiError(400, "Cancelled appointment cannot be completed");
+    throw new ApiError(400, "Appointment is already cancelled");
   }
 
   if (appointmentData.status === "completed") {
