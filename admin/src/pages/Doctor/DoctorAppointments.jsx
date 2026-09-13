@@ -54,6 +54,25 @@ const DoctorAppointments = () => {
     }
   };
 
+  const handleCompleteAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.patch(
+        backendUrl + "/api/doctor/appointmentslist/complete-appointment",
+        { appointmentId },
+        { headers: { Authorization: `Bearer ${dToken}` } },
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        getAppointments();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   useEffect(() => {
     if (dToken) {
       getAppointments();
@@ -359,6 +378,9 @@ const DoctorAppointments = () => {
                                 </button>
 
                                 <button
+                                  onClick={() =>
+                                    handleCompleteAppointment(data._id)
+                                  }
                                   type="button"
                                   className="
                         px-3 py-1.5
