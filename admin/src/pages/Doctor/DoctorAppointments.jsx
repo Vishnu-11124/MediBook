@@ -326,7 +326,7 @@ const DoctorAppointments = () => {
                       }
                     `}
                               >
-                                {data.paymentStatus ? "Online" : "CASH"}
+                                {data.paymentStatus ? "Paid" : "Pending"}
                               </span>
                             </td>
 

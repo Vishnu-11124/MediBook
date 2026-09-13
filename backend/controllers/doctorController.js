@@ -180,3 +180,19 @@ export const cancelAppointment = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, [], "Appointment successfully cancelled"));
 });
+
+//dashboard
+export const dashboardData = asyncHandler(async (req, res) => {
+  const doctorId = req.doctorId
+
+  const appointments = await AppointmentModel.find({doctorId})
+
+  let earnings = 0
+
+  appointments.map((item) => {
+    if(item.status === 'completed' && item.paymentStatus === 'paid'){
+      // calculate earnings
+    }
+  })
+
+})
