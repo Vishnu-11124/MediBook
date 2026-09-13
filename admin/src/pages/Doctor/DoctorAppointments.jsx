@@ -4,10 +4,17 @@ import { DoctorContext } from "../../context/DoctorContext";
 import { useEffect } from "react";
 import { useState } from "react";
 import { CalendarDays, LucideIndianRupee } from "lucide-react";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const DoctorAppointments = () => {
-  const { appointmentsList, dToken, getAppointments, appointmentHistory } =
-    useContext(DoctorContext);
+  const {
+    appointmentsList,
+    dToken,
+    backendUrl,
+    getAppointments,
+    appointmentHistory,
+  } = useContext(DoctorContext);
 
   const [history, setHistory] = useState(false);
 
@@ -27,6 +34,24 @@ const DoctorAppointments = () => {
     }
 
     return age;
+  };
+
+  const handleCancelAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.patch(
+        backendUrl + "/api/doctor/appointmentslist/cancel-appointment",
+        { appointmentId },
+        { headers: { Authorization: `Bearer ${dToken}` } },
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getAppointments();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
@@ -314,6 +339,9 @@ const DoctorAppointments = () => {
                             <td className="px-5 py-4">
                               <div className="flex items-center gap-2">
                                 <button
+                                  onClick={() =>
+                                    handleCancelAppointment(data._id)
+                                  }
                                   type="button"
                                   className="
                         flex items-center gap-1.5
