@@ -204,6 +204,10 @@ export const updatePaymentStatus = asyncHandler(async (req, res) => {
     throw new ApiError(403, "You cannot make changes to this appointment");
   }
 
+  if (appointmentData.status === "cancelled") {
+    throw new ApiError(400, "Cancelled appointment cannot be marked as paid");
+  }
+
   if (appointmentData.paymentStatus === "paid") {
     throw new ApiError(400, "Appointment is already paid");
   }
@@ -214,21 +218,20 @@ export const updatePaymentStatus = asyncHandler(async (req, res) => {
 
   res
     .status(200)
-    .json(new ApiResponse(200, [], "Appointment successfully paid"));
+    .json(new ApiResponse(200, [], "Appointment successfully marked as paid"));
 });
 
 //dashboard
 export const dashboardData = asyncHandler(async (req, res) => {
-  const doctorId = req.doctorId
+  const doctorId = req.doctorId;
 
-  const appointments = await AppointmentModel.find({doctorId})
+  const appointments = await AppointmentModel.find({ doctorId });
 
-  let earnings = 0
+  let earnings = 0;
 
   appointments.map((item) => {
-    if(item.status === 'completed' && item.paymentStatus === 'paid'){
+    if (item.status === "completed" && item.paymentStatus === "paid") {
       // calculate earnings
     }
-  })
-
-})
+  });
+});
