@@ -181,6 +181,42 @@ export const cancelAppointment = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, [], "Appointment successfully cancelled"));
 });
 
+export const updatePaymentStatus = asyncHandler(async (req, res) => {
+  const doctorId = req.doctorId;
+
+  if (!doctorId) {
+    throw new ApiError(401, "Doctor authentication required");
+  }
+
+  const { appointmentId } = req.body;
+
+  if (!appointmentId) {
+    throw new ApiError(400, "AppointmentId is required");
+  }
+
+  const appointmentData = await AppointmentModel.findById(appointmentId);
+
+  if (!appointmentData) {
+    throw new ApiError(404, "Appointment not found");
+  }
+
+  if (appointmentData.doctorId.toString() !== doctorId.toString()) {
+    throw new ApiError(403, "You cannot make changes to this appointment");
+  }
+
+  if (appointmentData.paymentStatus === "paid") {
+    throw new ApiError(400, "Appointment is already paid");
+  }
+
+  await AppointmentModel.findByIdAndUpdate(appointmentId, {
+    paymentStatus: "paid",
+  });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, [], "Appointment successfully paid"));
+});
+
 //dashboard
 export const dashboardData = asyncHandler(async (req, res) => {
   const doctorId = req.doctorId
