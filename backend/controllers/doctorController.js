@@ -229,7 +229,10 @@ export const dashboardData = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Doctor authentication required");
   }
 
-  const appointments = await AppointmentModel.find({ doctorId }).populate('userId', 'name image dob');
+  const appointments = await AppointmentModel.find({ doctorId }).populate(
+    "userId",
+    "name image dob",
+  );
 
   let earnings = 0;
   const patients = [];
@@ -285,4 +288,81 @@ export const doctorProfileData = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(200, profileData, "Doctor details fetched successfully"),
     );
+});
+
+// update profile
+export const updateDoctorProfile = asyncHandler(async (req, res) => {
+  const doctorId = req.doctorId;
+
+  if (!doctorId) {
+    throw new ApiError(401, "Doctor authentication required");
+  }
+
+  const { fees, available, address } = req.body;
+
+  const updateData = {};
+
+  // Validate fees
+  if (fees !== undefined) {
+    if (typeof fees !== "number" || !Number.isFinite(fees) || fees < 0) {
+      throw new ApiError(400, "Fees must be a valid number");
+    }
+
+    updateData.fees = fees;
+  }
+
+  // Validate availability
+  if (available !== undefined) {
+    if (typeof available !== "boolean") {
+      throw new ApiError(400, "Available must be a boolean");
+    }
+
+    updateData.available = available;
+  }
+
+  // Validate address
+  if (address !== undefined) {
+    if (
+      typeof address !== "object" ||
+      address === null ||
+      Array.isArray(address)
+    ) {
+      throw new ApiError(400, "Address must be an object");
+    }
+
+    if (
+      typeof address.line1 !== "string" ||
+      typeof address.line2 !== "string"
+    ) {
+      throw new ApiError(400, "Address line1 and line2 must be strings");
+    }
+
+    if (!address.line1.trim() || !address.line2.trim()) {
+      throw new ApiError(400, "Address line1 and line2 cannot be empty");
+    }
+
+    updateData.address = {
+      line1: address.line1.trim(),
+      line2: address.line2.trim(),
+    };
+  }
+
+  // No fields provided
+  if (Object.keys(updateData).length === 0) {
+    throw new ApiError(400, "No data provided for update");
+  }
+
+  const updatedDoctor = await DoctorModel.findByIdAndUpdate(
+    doctorId,
+    updateData,
+    { new: true },
+  ).select("-password");
+
+  if (!updatedDoctor) {
+    throw new ApiError(404, "Doctor not found");
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, updatedDoctor, "Profile updated successfully"));
 });
