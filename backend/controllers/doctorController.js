@@ -265,3 +265,24 @@ export const dashboardData = asyncHandler(async (req, res) => {
       ),
     );
 });
+
+//doctor profile data
+export const doctorProfileData = asyncHandler(async (req, res) => {
+  const doctorId = req.doctorId;
+
+  if (!doctorId) {
+    throw new ApiError(401, "Doctor authentication required");
+  }
+
+  const profileData = await DoctorModel.findById(doctorId).select("-password");
+
+  if (!profileData) {
+    throw new ApiError(404, "Doctor not found");
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, profileData, "Doctor details fetched successfully"),
+    );
+});
