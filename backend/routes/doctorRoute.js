@@ -1,5 +1,5 @@
 import express from 'express'
-import { allAppointmentsDoctor, appointmentCompleted, cancelAppointment, doctorLogin, getAllDoctors, updatePaymentStatus } from '../controllers/doctorController.js'
+import { allAppointmentsDoctor, appointmentCompleted, cancelAppointment, dashboardData, doctorLogin, getAllDoctors, updatePaymentStatus } from '../controllers/doctorController.js'
 import { isDoctor } from '../middlewares/authDoctor.js'
 
 const doctorRouter = express.Router()
@@ -15,5 +15,7 @@ doctorRouter.patch('/appointmentslist/complete-appointment', isDoctor, appointme
 doctorRouter.patch('/appointmentslist/cancel-appointment', isDoctor, cancelAppointment)
 
 doctorRouter.patch('/appointmentslist/update-payment-status', isDoctor, updatePaymentStatus)
+
+doctorRouter.get('/dashboard-data', isDoctor, dashboardData)
 
 export default doctorRouter

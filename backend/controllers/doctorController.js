@@ -225,13 +225,43 @@ export const updatePaymentStatus = asyncHandler(async (req, res) => {
 export const dashboardData = asyncHandler(async (req, res) => {
   const doctorId = req.doctorId;
 
+  if (!doctorId) {
+    throw new ApiError(401, "Doctor authentication required");
+  }
+
   const appointments = await AppointmentModel.find({ doctorId });
 
   let earnings = 0;
+  const patients = [];
 
-  appointments.map((item) => {
+  appointments.forEach((item) => {
+    // Calculate earnings
     if (item.status === "completed" && item.paymentStatus === "paid") {
-      // calculate earnings
+      earnings += item.amount;
+    }
+
+    // Calculate unique patients
+    const userId = item.userId.toString();
+
+    if (!patients.includes(userId)) {
+      patients.push(userId);
     }
   });
+
+  const dashData = {
+    earnings,
+    appointments: appointments.length,
+    patients: patients.length,
+    latestAppointments: appointments.slice().reverse().slice(0, 5),
+  };
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        dashData,
+        "Successfully fetched doctor dashboard data",
+      ),
+    );
 });
