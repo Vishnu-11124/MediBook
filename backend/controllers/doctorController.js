@@ -229,7 +229,7 @@ export const dashboardData = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Doctor authentication required");
   }
 
-  const appointments = await AppointmentModel.find({ doctorId });
+  const appointments = await AppointmentModel.find({ doctorId }).populate('userId', 'name image dob');
 
   let earnings = 0;
   const patients = [];
