@@ -304,46 +304,58 @@ export const updateDoctorProfile = asyncHandler(async (req, res) => {
 
   // Validate fees
   if (fees !== undefined) {
-    if (typeof fees !== "number" || !Number.isFinite(fees) || fees < 0) {
+    const parsedFees = Number(fees);
+
+    if (!Number.isFinite(parsedFees) || parsedFees < 0) {
       throw new ApiError(400, "Fees must be a valid number");
     }
 
-    updateData.fees = fees;
+    updateData.fees = parsedFees;
   }
 
   // Validate availability
   if (available !== undefined) {
-    if (typeof available !== "boolean") {
+    const parsedAvailable = available === "true";
+
+    if (available !== "true" && available !== "false") {
       throw new ApiError(400, "Available must be a boolean");
     }
 
-    updateData.available = available;
+    updateData.available = parsedAvailable;
   }
 
   // Validate address
   if (address !== undefined) {
+    let parsedAddress;
+
+    try {
+      parsedAddress = JSON.parse(address);
+    } catch {
+      throw new ApiError(400, "Invalid address format");
+    }
+
     if (
-      typeof address !== "object" ||
-      address === null ||
-      Array.isArray(address)
+      typeof parsedAddress !== "object" ||
+      parsedAddress === null ||
+      Array.isArray(parsedAddress)
     ) {
       throw new ApiError(400, "Address must be an object");
     }
 
     if (
-      typeof address.line1 !== "string" ||
-      typeof address.line2 !== "string"
+      typeof parsedAddress.line1 !== "string" ||
+      typeof parsedAddress.line2 !== "string"
     ) {
       throw new ApiError(400, "Address line1 and line2 must be strings");
     }
 
-    if (!address.line1.trim() || !address.line2.trim()) {
+    if (!parsedAddress.line1.trim() || !parsedAddress.line2.trim()) {
       throw new ApiError(400, "Address line1 and line2 cannot be empty");
     }
 
     updateData.address = {
-      line1: address.line1.trim(),
-      line2: address.line2.trim(),
+      line1: parsedAddress.line1.trim(),
+      line2: parsedAddress.line2.trim(),
     };
   }
 
