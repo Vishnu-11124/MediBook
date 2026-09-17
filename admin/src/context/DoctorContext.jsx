@@ -16,6 +16,8 @@ const DoctorContextProvider = (props) => {
   const [appointmentHistory, setAppointmentHistory] = useState([]);
   const [dashboardData, setDashboardData] = useState(false);
   const [profileData, setProfileData] = useState(false);
+  const [leaveList, setLeaveList] = useState([])
+
   const getAppointments = async () => {
     try {
       const { data } = await axios.get(
@@ -79,6 +81,22 @@ const DoctorContextProvider = (props) => {
     }
   };
 
+  const getLeaveList = async () => {
+    try {
+      const { data } = await axios.get(
+        backendUrl + "/api/doctor/leave-request-list",
+        { headers: { Authorization: `Bearer ${dToken}` } },
+      );
+      if (data.success) {
+        setLeaveList(data?.data);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   const value = {
     backendUrl,
     dToken,
@@ -94,6 +112,8 @@ const DoctorContextProvider = (props) => {
     profileData,
     setProfileData,
     getProfileData,
+    leaveList,
+    getLeaveList
   };
 
   return (
