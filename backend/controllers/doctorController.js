@@ -408,3 +408,31 @@ export const leaveRequest = asyncHandler(async (req, res) => {
       new ApiResponse(201, newLeaveRequest, "Leave request sent successfully"),
     );
 });
+
+export const getAllLeaveRequests = asyncHandler(async (req, res) => {
+  const doctorId = req.doctorId;
+
+  if (!doctorId) {
+    throw new ApiError(401, "Doctor authentication required");
+  }
+
+  const allRequestList = await LeaveModel.find({ doctorId }).sort({
+    createdAt: -1,
+  });
+
+  if (allRequestList.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, [], "No leave requests found"));
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        allRequestList,
+        "Successfully fetched all leave requests",
+      ),
+    );
+});
