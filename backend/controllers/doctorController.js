@@ -1,5 +1,6 @@
 import AppointmentModel from "../models/appointmentModel.js";
 import DoctorModel from "../models/doctorModel.js";
+import LeaveModel from "../models/leaveModel.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
@@ -365,4 +366,45 @@ export const updateDoctorProfile = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(new ApiResponse(200, updatedDoctor, "Profile updated successfully"));
+});
+
+// leave request
+export const leaveRequest = asyncHandler(async (req, res) => {
+  const doctorId = req.doctorId;
+
+  if (!doctorId) {
+    throw new ApiError(401, "Doctor authentication required");
+  }
+
+  const { reason, dates } = req.body;
+
+  if (!reason || !dates) {
+    throw new ApiError(400, "Reason and dates are required");
+  }
+
+  if (typeof reason !== "string" || !reason.trim()) {
+    throw new ApiError(400, "Reason must be a valid text");
+  }
+
+  if (!Array.isArray(dates) || dates.length === 0) {
+    throw new ApiError(400, "Leave dates are required");
+  }
+
+  const leaveRequestData = {
+    doctorId,
+    reason: reason.trim(),
+    dates,
+  };
+
+  const newLeaveRequest = await LeaveModel.create(leaveRequestData);
+
+  if (!newLeaveRequest) {
+    throw new ApiError(400, "Leave request could not be created");
+  }
+
+  res
+    .status(201)
+    .json(
+      new ApiResponse(201, newLeaveRequest, "Leave request sent successfully"),
+    );
 });

@@ -29,7 +29,7 @@ const leaveSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const LeaveModel = mongoose.model("Leave", leaveSchema);
