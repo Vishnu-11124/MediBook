@@ -248,7 +248,7 @@ const DoctorProfile = () => {
                     <select
                       name="available"
                       id="available"
-                      defaultValue={profileData.available}
+                      defaultValue={String(profileData.available)}
                       className="w-full px-3 py-2.5 rounded-lg border border-slate-200
                          text-sm text-slate-700 bg-white outline-none
                          focus:border-slate-400 focus:ring-1 focus:ring-slate-300"
