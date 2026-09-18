@@ -32,6 +32,8 @@ const LeaveApplications = () => {
       );
       if (data.success) {
         toast.success(data.message);
+        setLeaveDates([])
+        setReason()
         setFormOpen(false);
       } else {
         toast.error(data.message);
@@ -387,7 +389,9 @@ const LeaveApplications = () => {
 
                             if (leaveDates.includes(selectedDate)) return;
 
-                            setLeaveDates((prev) => [...prev, selectedDate]);
+                            let newDate = new Date(selectedDate)
+
+                            setLeaveDates((prev) => [...prev, newDate]);
                             setSelectedDate("");
                           }}
                           className="
@@ -425,7 +429,7 @@ const LeaveApplications = () => {
                       text-sm text-slate-700
                     "
                             >
-                              <span>{date}</span>
+                              <span>{date.toLocaleDateString("en-GB")}</span>
 
                               <button
                                 type="button"
