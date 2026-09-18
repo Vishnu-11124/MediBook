@@ -3,6 +3,8 @@ import { useContext } from "react";
 import { DoctorContext } from "../../context/DoctorContext";
 import { useEffect } from "react";
 import { CalendarPlus, FileText, History, X } from "lucide-react";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const LeaveApplications = () => {
   const { dToken, backendUrl, leaveList, getLeaveList } =
@@ -19,10 +21,24 @@ const LeaveApplications = () => {
 
     const leaveRequest = {
       reason,
-      leaveDates,
+      dates: leaveDates,
     };
 
-    console.log("Leave", leaveRequest);
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/doctor/add-leave-request",
+        leaveRequest,
+        { headers: { Authorization: `Bearer ${dToken}` } },
+      );
+      if (data.success) {
+        toast.success(data.message);
+        setFormOpen(false);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
