@@ -16,6 +16,14 @@ const LeaveApplications = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [leaveDates, setLeaveDates] = useState([]);
 
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
   const handleApplyLeave = async (e) => {
     e.preventDefault();
 
@@ -32,8 +40,8 @@ const LeaveApplications = () => {
       );
       if (data.success) {
         toast.success(data.message);
-        setLeaveDates([])
-        setReason()
+        setLeaveDates([]);
+        setReason();
         setFormOpen(false);
       } else {
         toast.error(data.message);
@@ -121,8 +129,13 @@ const LeaveApplications = () => {
                     <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
                       Dates
                     </p>
-
-                    <p className="text-sm text-slate-700 mt-1">{data.dates}</p>
+                    <div>
+                      {data.dates.map((date, i) => (
+                        <p key={i} className="text-sm text-slate-700 mt-1">
+                          {formatDate(date)}
+                        </p>
+                      ))}
+                    </div>{" "}
                   </div>
 
                   {/* Status */}
@@ -195,9 +208,13 @@ const LeaveApplications = () => {
                         Dates
                       </p>
 
-                      <p className="text-sm text-slate-700 mt-1">
-                        {data.dates}
-                      </p>
+                      <div>
+                        {data.dates.map((date, i) => (
+                          <p key={i} className="text-sm text-slate-700 mt-1">
+                            {formatDate(date)}
+                          </p>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Status */}
@@ -389,9 +406,7 @@ const LeaveApplications = () => {
 
                             if (leaveDates.includes(selectedDate)) return;
 
-                            let newDate = new Date(selectedDate)
-
-                            setLeaveDates((prev) => [...prev, newDate]);
+                            setLeaveDates((prev) => [...prev, selectedDate]);
                             setSelectedDate("");
                           }}
                           className="
@@ -429,7 +444,7 @@ const LeaveApplications = () => {
                       text-sm text-slate-700
                     "
                             >
-                              <span>{date.toLocaleDateString("en-GB")}</span>
+                              <span>{date}</span>
 
                               <button
                                 type="button"
