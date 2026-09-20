@@ -161,26 +161,24 @@ export const allDoctors = asyncHandler(async (req, res) => {
 
 // fetch all leaves requests
 export const allLeaveRequests = asyncHandler(async (req, res) => {
-  const leaveRequests = await LeaveModel.find({ status: "pending" }).populate(
-    "doctorId",
-    "name email speciality image",
-  );
+  const leaveRequests = await LeaveModel.find({
+    status: "pending",
+  }).populate("doctorId", "name email speciality image");
 
-  if (leaveRequests.length === 0) {
-    return res
-      .status(200)
-      .json(new ApiResponse(200, [], "No pending leave requests found"));
-  }
+  const leaveHistory = await LeaveModel.find({
+    status: { $in: ["approved", "rejected"] },
+  }).populate("doctorId", "name email speciality image");
 
-  res
-    .status(200)
-    .json(
-      new ApiResponse(
-        200,
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
         leaveRequests,
-        "Successfully fetched leave requests",
-      ),
-    );
+        leaveHistory,
+      },
+      "Successfully fetched leave requests",
+    ),
+  );
 });
 
 // doctor availability

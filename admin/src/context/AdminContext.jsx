@@ -10,7 +10,7 @@ const AdminContextProvider = (props) => {
   );
   const [doctors, setDoctors] = useState([]);
   const [appointmentsList, setAppointmentsList] = useState([]);
-  const [dashboardData, setDashboardData] = useState(false)
+  const [dashboardData, setDashboardData] = useState(false);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const getAllDoctors = async () => {
@@ -22,7 +22,7 @@ const AdminContextProvider = (props) => {
       });
       if (data.success) {
         setDoctors(data?.data);
-        console.log(data?.data);
+        // console.log(data?.data);
       } else {
         toast.error(data.message);
       }
@@ -46,11 +46,11 @@ const AdminContextProvider = (props) => {
         setAppointmentsList(data?.data);
       } else {
         toast.error(data.message);
-        console.log(data.message);
+        // console.log(data.message);
       }
     } catch (error) {
       toast.error(error.message);
-      console.log(error.message);
+      // console.log(error.message);
     }
   };
 
@@ -81,7 +81,7 @@ const AdminContextProvider = (props) => {
     setAppointmentsList,
     getAllAppointments,
     dashboardData,
-    getDashboardData
+    getDashboardData,
   };
 
   return (
