@@ -33,6 +33,10 @@ const LeaveRequests = () => {
     }
   };
 
+  const handleLeaveStatus = async (status) => {
+
+  }
+
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-GB", {
       day: "2-digit",
@@ -325,19 +329,9 @@ const LeaveRequests = () => {
                     </div>
 
                     {/* Status */}
-                    <div>
-                      <span
-                        className="
-                        inline-flex items-center
-                        px-2.5 py-1
-                        rounded-full
-                        bg-yellow-50
-                        text-yellow-700
-                        text-xs font-medium
-                      "
-                      >
-                        Pending
-                      </span>
+                    <div className="flex gap-2">
+                      <button onClick={() => handleLeaveStatus('rejected')}>Reject</button>
+                      <button onClick={() => handleLeaveStatus('approved')}>Approve</button>
                     </div>
                   </div>
                 </div>
