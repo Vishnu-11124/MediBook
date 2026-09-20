@@ -33,9 +33,13 @@ const LeaveRequests = () => {
     }
   };
 
-  const handleLeaveStatus = async (status) => {
+  const handleRejectLeave = (leaveId) => {
+    console.log(leaveId);
+  };
 
-  }
+  const handleApproveLeave = (leaveId) => {
+    console.log(leaveId);
+  };
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-GB", {
@@ -329,9 +333,38 @@ const LeaveRequests = () => {
                     </div>
 
                     {/* Status */}
+
                     <div className="flex gap-2">
-                      <button onClick={() => handleLeaveStatus('rejected')}>Reject</button>
-                      <button onClick={() => handleLeaveStatus('approved')}>Approve</button>
+                      <button
+                        onClick={() => handleRejectLeave(data._id)}
+                        className="
+      px-3 py-1.5
+      rounded-lg
+      border border-red-200
+      bg-red-50
+      text-sm font-medium text-red-600
+      hover:bg-red-100
+      transition
+      cursor-pointer
+    "
+                      >
+                        Reject
+                      </button>
+
+                      <button
+                        onClick={() => handleApproveLeave(data._id)}
+                        className="
+      px-3 py-1.5
+      rounded-lg
+      bg-green-600
+      text-sm font-medium text-white
+      hover:bg-green-700
+      transition
+      cursor-pointer
+    "
+                      >
+                        Approve
+                      </button>
                     </div>
                   </div>
                 </div>
