@@ -310,3 +310,33 @@ export const adminDashboardData = asyncHandler(async (req, res) => {
       ),
     );
 });
+
+export const rejectLeaveRequest = asyncHandler(async (req, res) => {
+  const { requestId } = req.body;
+
+  if (!requestId) {
+    throw new ApiError(400, "RequestId is required");
+  }
+
+  const leaveRequest = await LeaveModel.findById(requestId);
+
+  if (!leaveRequest) {
+    throw new ApiError(404, "Leave request not found");
+  }
+
+  if (leaveRequest.status === "rejected") {
+    throw new ApiError(400, "Leave request is already rejected");
+  }
+
+  if (leaveRequest.status === "approved") {
+    throw new ApiError(400, "Leave request is already approved");
+  }
+
+  await LeaveModel.findByIdAndUpdate(requestId, {
+    status: "rejected",
+  });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, [], "Leave request rejected successfully"));
+});
