@@ -9,6 +9,7 @@ import {
   Users,
   CalendarClock,
   CircleUserRound,
+  CalendarPlus,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -41,6 +42,11 @@ const Sidebar = () => {
       path: "/leave-requests",
       icon: CalendarClock,
     },
+    {
+      name: "Add Leave",
+      path: "/add-leave",
+      icon:  CalendarPlus,
+    }
   ];
 
   const doctorMenuItems = [
