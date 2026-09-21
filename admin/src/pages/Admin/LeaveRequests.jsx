@@ -33,12 +33,26 @@ const LeaveRequests = () => {
     }
   };
 
-  const handleRejectLeave = (leaveId) => {
-    console.log(leaveId);
+  const handleRejectLeave = async (requestId) => {
+    try {
+      const { data } = await axios.patch(
+        backendUrl + "/api/admin/request-list/reject-request",
+        {requestId},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getLeaveRequests();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
-  const handleApproveLeave = (leaveId) => {
-    console.log(leaveId);
+  const handleApproveLeave = (requestId) => {
+    console.log(requestId);
   };
 
   const formatDate = (date) => {
