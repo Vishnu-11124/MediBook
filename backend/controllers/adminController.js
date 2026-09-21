@@ -370,3 +370,22 @@ export const approveLeaveRequest = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, [], "Leave request approved successfully"));
 });
+
+export const approvedLeaveList = asyncHandler(async (req, res) => {
+  const approvedList = await LeaveModel.find({ status: "approved" })
+    .populate("doctorId", "name speciality image")
+    .sort({ createdAt: -1 });
+
+  if (approvedList.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, [], "Approved list is empty"));
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, approvedList, "Successfully fetched approved list"),
+    );
+});
+
