@@ -389,3 +389,33 @@ export const approvedLeaveList = asyncHandler(async (req, res) => {
     );
 });
 
+export const addLeave = asyncHandler(async (req, res) => {
+  const {doctorId, dates, requestId} = req.body
+  if(!doctorId || !dates || !requestId){
+    throw new ApiError(401,"doctorid and dates are required")
+  }
+
+  const availableData = await DoctorAvailabilityModel.find({doctor: doctorId})
+  if(!availableData){
+    throw new ApiError(404,"Doctor availability data is not found")
+  }
+
+  let newDate = []
+
+  dates.map((date) => {
+    if(!availableData.leave.includes(date)){
+      newDate.push(date)
+    }
+  }
+
+  )
+
+  if(newDate.length === 0){
+    throw new ApiError(200, "These dates are already added")
+  }
+
+  await DoctorAvailabilityModel.findByIdAndUpdate(availableData._id, {leaves: newDate})
+
+  res.status(200).json(new ApiResponse(200,[], "Successfully added leave dates"))
+})
+
