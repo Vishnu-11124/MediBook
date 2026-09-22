@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { AdminContext } from "../../context/AdminContext";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { X } from "lucide-react";
+import { CalendarDays, X } from "lucide-react";
 
 const DoctorDetails = () => {
   const { token, backendUrl } = useContext(AdminContext);
@@ -116,6 +116,14 @@ const DoctorDetails = () => {
     return date.toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
+    });
+  };
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
     });
   };
 
@@ -256,95 +264,161 @@ const DoctorDetails = () => {
           </div>
 
           {/* ================= Availability ================= */}
-          <div className="bg-white border border-gray-200 rounded-xl">
-            {availability ? (
-              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                {/* Header */}
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div>
+              {availability ? (
+                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                  {/* Header */}
+                  <div className="px-6 py-5 flex items-center justify-between">
+                    <div>
+                      <h2 className="text-lg font-semibold text-gray-800">
+                        Doctor Availability
+                      </h2>
+
+                      <p className="text-sm text-gray-500 mt-1">
+                        Weekly working schedule
+                      </p>
+                    </div>
+                  </div>
+
+                  <hr className="border-gray-100" />
+
+                  {/* Availability */}
+                  <div className="p-6">
+                    <div className="space-y-4">
+                      {availability.availability.map((slot, index) => (
+                        <div
+                          key={index}
+                          className="border border-gray-200 rounded-xl p-5"
+                        >
+                          {/* Days */}
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {slot.days.map((day) => (
+                              <span
+                                key={day}
+                                className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium"
+                              >
+                                {day}
+                              </span>
+                            ))}
+                          </div>
+
+                          {/* Time */}
+                          <div className="flex items-center gap-3">
+                            <div>
+                              <p className="text-xs text-gray-500 mb-1">
+                                Working Hours
+                              </p>
+
+                              <p className="text-base font-semibold text-gray-800">
+                                {formatTime(slot.start)} -{" "}
+                                {formatTime(slot.end)}
+                              </p>
+                            </div>
+
+                            <div className="h-8 w-px bg-gray-200" />
+
+                            {/* Duration */}
+                            <div>
+                              <p className="text-xs text-gray-500 mb-1">
+                                Slot Duration
+                              </p>
+
+                              <p className="text-sm font-medium text-gray-700">
+                                {slot.slotDuration} minutes
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="min-h-[300px] flex flex-col items-center justify-center text-center p-6">
+                  <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                    <span className="text-xl">+</span>
+                  </div>
+
+                  <h3 className="text-base font-semibold text-gray-800">
+                    Availability not configured
+                  </h3>
+
+                  <p className="text-sm text-gray-500 mt-2 max-w-xs">
+                    Add the doctor's weekly working hours to allow appointments
+                    to be scheduled.
+                  </p>
+
+                  <button
+                    onClick={() => setFormOpen(true)}
+                    className="mt-5 px-5 py-2.5 rounded-lg bg-gray-900 text-white text-sm hover:bg-gray-800 transition"
+                  >
+                    Add Availability
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {availability?.leaves?.length > 0 && (
+              <div className="border-t border-gray-200">
+                {/* Leave Header */}
                 <div className="px-6 py-5 flex items-center justify-between">
                   <div>
                     <h2 className="text-lg font-semibold text-gray-800">
-                      Doctor Availability
+                      Leave Dates
                     </h2>
 
                     <p className="text-sm text-gray-500 mt-1">
-                      Weekly working schedule
+                      Dates when the doctor is unavailable for appointments
                     </p>
                   </div>
+
+                  <button
+                    type="button"
+                    className="
+            px-3.5 py-2
+            rounded-lg
+            border border-red-200
+            bg-red-50
+            text-sm font-medium text-red-600
+            hover:bg-red-100
+            transition
+            cursor-pointer
+          "
+                  >
+                    Clear Leave
+                  </button>
                 </div>
 
                 <hr className="border-gray-100" />
 
-                {/* Availability */}
+                {/* Leave Dates */}
                 <div className="p-6">
-                  <div className="space-y-4">
-                    {availability.availability.map((slot, index) => (
+                  <div className="flex flex-wrap gap-3">
+                    {availability.leaves.map((date, i) => (
                       <div
-                        key={index}
-                        className="border border-gray-200 rounded-xl p-5"
+                        key={i}
+                        className="
+                flex items-center gap-2
+                px-3.5 py-2.5
+                rounded-lg
+                bg-gray-50
+                border border-gray-200
+              "
                       >
-                        {/* Days */}
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {slot.days.map((day) => (
-                            <span
-                              key={day}
-                              className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium"
-                            >
-                              {day}
-                            </span>
-                          ))}
-                        </div>
+                        <CalendarDays
+                          size={16}
+                          className="text-gray-500"
+                          strokeWidth={1.8}
+                        />
 
-                        {/* Time */}
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <p className="text-xs text-gray-500 mb-1">
-                              Working Hours
-                            </p>
-
-                            <p className="text-base font-semibold text-gray-800">
-                              {formatTime(slot.start)} - {formatTime(slot.end)}
-                            </p>
-                          </div>
-
-                          <div className="h-8 w-px bg-gray-200" />
-
-                          {/* Duration */}
-                          <div>
-                            <p className="text-xs text-gray-500 mb-1">
-                              Slot Duration
-                            </p>
-
-                            <p className="text-sm font-medium text-gray-700">
-                              {slot.slotDuration} minutes
-                            </p>
-                          </div>
-                        </div>
+                        <span className="text-sm font-medium text-gray-700">
+                          {formatDate(date.date)}
+                        </span>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div className="min-h-[300px] flex flex-col items-center justify-center text-center p-6">
-                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                  <span className="text-xl">+</span>
-                </div>
-
-                <h3 className="text-base font-semibold text-gray-800">
-                  Availability not configured
-                </h3>
-
-                <p className="text-sm text-gray-500 mt-2 max-w-xs">
-                  Add the doctor's weekly working hours to allow appointments to
-                  be scheduled.
-                </p>
-
-                <button
-                  onClick={() => setFormOpen(true)}
-                  className="mt-5 px-5 py-2.5 rounded-lg bg-gray-900 text-white text-sm hover:bg-gray-800 transition"
-                >
-                  Add Availability
-                </button>
               </div>
             )}
           </div>
