@@ -36,6 +36,23 @@ const AddLeave = () => {
     });
   };
 
+  const handleAddLeaveDates = async (requestId) => {
+    try {
+      const { data } = await axios.patch(
+        backendUrl + "/api/admin/approved-leave-list/add-leave",
+        {requestId},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   useEffect(() => {
     if (token) {
       getLeaveApprovedList();
@@ -175,6 +192,7 @@ const AddLeave = () => {
                       {/* Action */}
                       <td className="px-5 py-4 text-center">
                         <button
+                        onClick={() => handleAddLeaveDates(data._id)}
                           type="button"
                           className="
                           inline-flex items-center gap-1.5
