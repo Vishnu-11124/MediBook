@@ -390,32 +390,56 @@ export const approvedLeaveList = asyncHandler(async (req, res) => {
 });
 
 export const addLeave = asyncHandler(async (req, res) => {
-  const {doctorId, dates, requestId} = req.body
-  if(!doctorId || !dates || !requestId){
-    throw new ApiError(401,"doctorid and dates are required")
+  const { requestId } = req.body;
+
+  if (!requestId) {
+    throw new ApiError(400, "RequestId is required");
   }
 
-  const availableData = await DoctorAvailabilityModel.find({doctor: doctorId})
-  if(!availableData){
-    throw new ApiError(404,"Doctor availability data is not found")
+  const leaveRequest = await LeaveModel.findById(requestId);
+
+  if (!leaveRequest) {
+    throw new ApiError(404, "Leave request not found");
   }
 
-  let newDate = []
+  if (leaveRequest.status !== "approved") {
+    throw new ApiError(400, "Leave request is not approved");
+  }
 
-  dates.map((date) => {
-    if(!availableData.leave.includes(date)){
-      newDate.push(date)
+  const availabilityData = await DoctorAvailabilityModel.findOne({
+    doctor: leaveRequest.doctorId,
+  });
+
+  if (!availabilityData) {
+    throw new ApiError(404, "Doctor availability not found");
+  }
+
+  const newDate = [];
+
+  leaveRequest.dates.forEach((date) => {
+    const alreadyExists = availabilityData.leaves.some(
+      (leave) =>
+        new Date(leave.date).toISOString().split("T")[0] ===
+        new Date(date).toISOString().split("T")[0],
+    );
+
+    if (alreadyExists) {
+      throw new ApiError(400, "The date is already added");
     }
-  }
 
-  )
+    newDate.push({
+      leaveId: requestId,
+      date,
+      reason: leaveRequest.reason,
+    });
+  });
 
-  if(newDate.length === 0){
-    throw new ApiError(200, "These dates are already added")
-  }
+  availabilityData.leaves.push(...newDate);
 
-  await DoctorAvailabilityModel.findByIdAndUpdate(availableData._id, {leaves: newDate})
+  await availabilityData.save();
 
-  res.status(200).json(new ApiResponse(200,[], "Successfully added leave dates"))
-})
+  res
+    .status(200)
+    .json(new ApiResponse(200, [], "Successfully added leave dates"));
+});
 
