@@ -153,8 +153,22 @@ const DoctorDetails = () => {
   };
 
   const handleRemoveLeaves = async () => {
-
-  }
+    try {
+      const { data } = await axios.patch(
+        backendUrl +
+          `/api/admin/doctors/${doctorId}/doctor-details/remove-leave-dates`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (data.success) {
+        toast.success(data.messsage);
+        getDoctorDetails()
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   useEffect(() => {
     getDoctorDetails();
