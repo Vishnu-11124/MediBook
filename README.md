@@ -1,4 +1,3 @@
-
 # MediBook 🏥
 
 MediBook is a full-stack hospital appointment management platform designed for small hospitals and clinics. It provides a simple and efficient way for patients to find doctors, check their availability, book appointments, and manage payments.
@@ -70,6 +69,7 @@ Each doctor can have:
 
 For example:
 
+```text
 Doctor Availability
 
 Monday    10:00 AM - 04:00 PM
@@ -77,7 +77,7 @@ Wednesday 10:00 AM - 04:00 PM
 Friday    10:00 AM - 04:00 PM
 
 Slot Duration: 30 minutes
-
+```
 
 The system generates appointment slots based on the doctor's availability and prevents already-booked slots from being available for another patient.
 
@@ -106,6 +106,7 @@ MediBook uses JWT-based authentication to secure the application.
 
 Different roles have access to different parts of the system:
 
+```text
 Patient
    ↓
 Patient Portal
@@ -117,7 +118,7 @@ Doctor Portal
 Admin
    ↓
 Admin Portal
-
+```
 
 Protected backend routes use authentication middleware to verify the user's JWT and role before allowing access.
 
@@ -168,6 +169,7 @@ Protected backend routes use authentication middleware to verify the user's JWT 
 
 ## 🏗️ Project Structure
 
+```text
 MediBook/
 │
 ├── frontend/          # Patient-facing application
@@ -177,7 +179,7 @@ MediBook/
 ├── backend/           # Node.js & Express API
 │
 └── README.md
-
+```
 
 ---
 
