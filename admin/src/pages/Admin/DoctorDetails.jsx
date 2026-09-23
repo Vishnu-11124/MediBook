@@ -152,6 +152,10 @@ const DoctorDetails = () => {
     }
   };
 
+  const handleRemoveLeaves = async () => {
+
+  }
+
   useEffect(() => {
     getDoctorDetails();
   }, [doctorId, token]);
@@ -374,6 +378,8 @@ const DoctorDetails = () => {
                   </div>
 
                   <button
+
+                  onClick={handleRemoveLeaves}
                     type="button"
                     className="
             px-3.5 py-2

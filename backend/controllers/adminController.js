@@ -443,3 +443,44 @@ export const addLeave = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, [], "Successfully added leave dates"));
 });
 
+export const removeLeaves = asyncHandler(async (req, res) => {
+  const { doctorId } = req.params;
+
+  if (!doctorId) {
+    throw new ApiError(400, "Doctor id required");
+  }
+
+  const availability = await DoctorAvailabilityModel.findOne({
+    doctor: doctorId,
+  });
+
+  if (!availability) {
+    throw new ApiError(404, "Doctor availability data not found");
+  }
+
+  if (availability.leaves.length === 0) {
+    throw new ApiError(400, "Leave dates are already empty");
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const activeLeaves = availability.leaves.filter((leave) => {
+    const leaveDate = new Date(leave.date);
+    leaveDate.setHours(0, 0, 0, 0);
+
+    return leaveDate >= today;
+  });
+
+  if (activeLeaves.length === availability.leaves.length) {
+    throw new ApiError(400, "No expired leave dates found");
+  }
+
+  availability.leaves = activeLeaves;
+
+  await availability.save();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, [], "Expired leave dates removed successfully"));
+});

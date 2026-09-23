@@ -1,5 +1,5 @@
 import express from "express";
-import { addDoctor, addDoctorAvailability, addLeave, adminDashboardData, adminLogin, allAppointments, allDoctors, allLeaveRequests, approvedLeaveList, approveLeaveRequest, doctorDetails, rejectLeaveRequest } from "../controllers/adminController.js";
+import { addDoctor, addDoctorAvailability, addLeave, adminDashboardData, adminLogin, allAppointments, allDoctors, allLeaveRequests, approvedLeaveList, approveLeaveRequest, doctorDetails, rejectLeaveRequest, removeLeaves } from "../controllers/adminController.js";
 import uplpoad from "../middlewares/multer.js";
 import { isAdmin } from "../middlewares/authAdmin.js";
 
@@ -28,5 +28,7 @@ adminRouter.patch('/request-list/approve-request', isAdmin, approveLeaveRequest)
 adminRouter.get('/approved-leave-list', isAdmin, approvedLeaveList)
 
 adminRouter.patch('/approved-leave-list/add-leave', isAdmin, addLeave)
+
+adminRouter.patch('/doctors/:doctorId/doctor-details/remove-leave-dates', isAdmin, removeLeaves)
 
 export default adminRouter;
